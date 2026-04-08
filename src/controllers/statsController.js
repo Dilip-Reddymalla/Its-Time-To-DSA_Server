@@ -9,10 +9,16 @@ const getStats = async (req, res, next) => {
     // Heatmap data: date → count
     // Use UTC date parts explicitly so keys are stable regardless of server timezone
     const heatmap = {};
+    const istFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' });
+
     allProgress.forEach((p) => {
-      const d = new Date(p.date);
-      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-      heatmap[key] = p.completed.length;
+      // Use IST formatter to get a stable YYYY-MM-DD key for that timestamp
+      const key = istFormatter.format(new Date(p.date));
+      if (p.isRestDay) {
+        heatmap[key] = -1;
+      } else {
+        heatmap[key] = p.completed.length;
+      }
     });
 
     // Topic breakdown
@@ -41,6 +47,7 @@ const getStats = async (req, res, next) => {
       data: {
         currentStreak: user.currentStreak,
         longestStreak: user.longestStreak,
+        restTokens: user.restTokens,
         totalSolved: user.totalSolved,
         daysActive,
         topicBreakdown: topicMap,

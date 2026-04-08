@@ -78,8 +78,36 @@ const checkAndBreakStreak = async (userId) => {
   const isAfterMidnight = nowIST.getUTCHours() >= 2; // grace period: 2h
 
   if (solvedYesterday === 0 && isAfterMidnight) {
-    await User.findByIdAndUpdate(userId, { currentStreak: 0 });
-    return 0;
+    if (user.restTokens > 0) {
+      // Consume a rest token to protect the streak
+      await User.findByIdAndUpdate(userId, { $inc: { restTokens: -1 } });
+      
+      if (yesterdayProgress) {
+        yesterdayProgress.isRestDay = true;
+        await yesterdayProgress.save();
+      } else {
+        // Create an empty progress with isRestDay to show on heatmap
+        const Schedule = require('../models/Schedule');
+        const sched = await Schedule.findOne({ userId });
+        const dayEntry = sched?.days.find(d => {
+          const d2 = new Date(d.date);
+          d2.setHours(0,0,0,0);
+          return d2.getTime() === yesterday.getTime();
+        });
+        
+        await Progress.create({
+          userId,
+          date: yesterday,
+          dayNumber: dayEntry ? dayEntry.dayNumber : 0,
+          isRestDay: true
+        });
+      }
+      return user.currentStreak;
+    } else {
+      // No tokens left, streak is broken
+      await User.findByIdAndUpdate(userId, { currentStreak: 0 });
+      return 0;
+    }
   }
 
   return user.currentStreak;

@@ -4,13 +4,15 @@ const Schedule = require('../models/Schedule');
 const User = require('../models/User');
 const { createError } = require('../middleware/errorHandler');
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
+// Must match scheduleController's date logic exactly: YYYY-MM-DDT00:00:00Z
 const getTodayIST = () => {
-  const now = new Date();
-  const ist = new Date(now.getTime() + IST_OFFSET_MS);
-  ist.setUTCHours(0, 0, 0, 0);
-  return new Date(ist.getTime() - IST_OFFSET_MS);
+  const todayStr = new Intl.DateTimeFormat('en-CA', { 
+    timeZone: 'Asia/Kolkata', 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  }).format(new Date());
+  return new Date(todayStr + 'T00:00:00Z');
 };
 
 const getAllProgress = async (req, res, next) => {
@@ -63,8 +65,23 @@ const markProblem = async (req, res, next) => {
     const { problemId, solved } = req.body;
     const today = getTodayIST();
 
-    const progress = await Progress.findOne({ userId: req.user._id, date: today });
-    if (!progress) return next(createError('No progress entry for today.', 404, 'NO_PROGRESS'));
+    // Find or auto-create today's progress doc (upsert)
+    let progress = await Progress.findOne({ userId: req.user._id, date: today });
+    if (!progress) {
+      // Pull the assigned problem IDs from today's schedule to build the doc
+      const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
+      const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
+      const dayEntry = schedule?.days.find((d) => {
+        return new Date(d.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' }) === todayStr;
+      });
+      const assignedIds = dayEntry?.problems?.map(p => p.problemId) || dayEntry?.problemIds || [];
+      progress = await Progress.create({
+        userId: req.user._id,
+        date: today,
+        dayNumber: dayEntry?.dayNumber,
+        assigned: assignedIds,
+      });
+    }
 
     if (solved) {
       const already = progress.completed.find((c) => c.problemId.toString() === problemId);
@@ -73,7 +90,11 @@ const markProblem = async (req, res, next) => {
         await User.findByIdAndUpdate(req.user._id, { $inc: { totalSolved: 1 } });
       }
     } else {
-      progress.completed = progress.completed.filter((c) => c.problemId.toString() !== problemId);
+      const alreadyIndex = progress.completed.findIndex((c) => c.problemId.toString() === problemId);
+      if (alreadyIndex !== -1) {
+        progress.completed.splice(alreadyIndex, 1);
+        await User.findByIdAndUpdate(req.user._id, { $inc: { totalSolved: -1 } });
+      }
     }
 
     progress.allDone = progress.completed.length >= progress.assigned.length;

@@ -32,6 +32,7 @@ const progressSchema = new mongoose.Schema(
 
     verifiedAt: { type: Date, default: null },
     allDone: { type: Boolean, default: false },
+    isRestDay: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

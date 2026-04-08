@@ -4,7 +4,13 @@ const Problem = require('../models/Problem');
 const { createError } = require('../middleware/errorHandler');
 
 const getTodayISTStr = () => {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' }); // sv-SE gives YYYY-MM-DD reliably
+  // en-CA is uniquely robust for YYYY-MM-DD across platforms
+  return new Intl.DateTimeFormat('en-CA', { 
+    timeZone: 'Asia/Kolkata', 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  }).format(new Date());
 };
 
 const getToday = async (req, res, next) => {
@@ -44,6 +50,8 @@ const getToday = async (req, res, next) => {
       };
     });
 
+    const solvedCount = enrichedProblems.filter(p => p.solved).length;
+
     res.json({
       success: true,
       data: {
@@ -56,8 +64,8 @@ const getToday = async (req, res, next) => {
         isCompleted: dayEntry.isCompleted || false,
         progress: {
           total: enrichedProblems.length,
-          completed: completedIds.size,
-          allDone: progress?.allDone || false,
+          completed: solvedCount,
+          allDone: solvedCount >= enrichedProblems.length && enrichedProblems.length > 0,
         },
       },
     });

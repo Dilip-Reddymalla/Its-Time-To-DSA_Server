@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
     // Streak & Stats
     currentStreak: { type: Number, default: 0 },
     longestStreak: { type: Number, default: 0 },
+    restTokens: { type: Number, default: 1, max: 3 },
     totalSolved: { type: Number, default: 0 },
 
     lastActiveAt: { type: Date, default: Date.now },
