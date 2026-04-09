@@ -39,8 +39,12 @@ router.post('/logout', (req, res) => {
 
 // GET /api/auth/me — Return current user
 router.get('/me', authGuard, (req, res) => {
+  // Pass a token since authGuard rotates it
+  const currentToken = req.cookies?.token || (req.headers.authorization ? req.headers.authorization.split(' ')[1] : null);
+
   res.json({
     success: true,
+    token: res.getHeader('X-Auth-Token') || currentToken, // Explicitly include token in response body for iOS support
     user: {
       _id: req.user._id,
       name: req.user.name,

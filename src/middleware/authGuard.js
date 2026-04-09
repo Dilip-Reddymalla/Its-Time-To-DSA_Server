@@ -8,7 +8,12 @@ const { generateToken, setAuthCookie } = require('../config/passport');
  */
 const authGuard = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    let token = req.cookies?.token;
+
+    // Fallback to checking the Authorization header (e.g. "Bearer <token>") for iOS/Apple ecosystem
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
 
     if (!token) {
       return res.status(401).json({
@@ -48,6 +53,10 @@ const authGuard = async (req, res, next) => {
     // Rotate token on each request
     const newToken = generateToken(user._id);
     setAuthCookie(res, newToken);
+
+    // Also send the token in response headers for iOS clients that block cookies
+    res.setHeader('X-Auth-Token', newToken);
+    res.setHeader('Authorization', `Bearer ${newToken}`);
 
     // Attach user to request
     req.user = user;
