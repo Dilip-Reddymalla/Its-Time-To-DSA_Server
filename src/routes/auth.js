@@ -20,10 +20,11 @@ router.get(
     setAuthCookie(res, token);
 
     // Redirect based on onboarding status
+    // Use hash fragment for secure token delivery to clients that block cookies (e.g., iOS/Brave)
     if (!req.user.onboardingComplete) {
-      return res.redirect(`${process.env.CLIENT_URL}/onboarding`);
+      return res.redirect(`${process.env.CLIENT_URL}/onboarding#token=${token}`);
     }
-    res.redirect(`${process.env.CLIENT_URL}/dashboard/today`);
+    res.redirect(`${process.env.CLIENT_URL}/dashboard/today#token=${token}`);
   }
 );
 
