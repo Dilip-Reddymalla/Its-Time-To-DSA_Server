@@ -28,7 +28,7 @@ const getToday = async (req, res, next) => {
 
     const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
     const problems = await Problem.find({ _id: { $in: problemIds } }).lean();
-    
+
     // Look up progress for this specific IST day
     const dayStart = new Date(todayStr + 'T00:00:00Z');
     const progress = await Progress.findOne({ userId: req.user._id, date: dayStart }).lean();
@@ -43,6 +43,7 @@ const getToday = async (req, res, next) => {
       return {
         ...p,
         isRevision: schedProb?.isRevision || false,
+        isCarryover: false,
         status: schedProb?.status || 'pending',
         solved: completedIds.has(p._id.toString()),
         bookmarked: bookmarkedIds.has(p._id.toString()),
@@ -50,7 +51,66 @@ const getToday = async (req, res, next) => {
       };
     });
 
-    const solvedCount = enrichedProblems.filter(p => p.solved).length;
+    // === CARRY-OVER: Append unsolved problems from past days ===
+    // Find all past Progress docs where NOT all problems were done
+    const pastProgressDocs = await Progress.find({
+      userId: req.user._id,
+      date: { $lt: dayStart },
+      allDone: { $ne: true },
+    }).lean();
+
+    // Collect problem IDs that were assigned but not completed on past days
+    const alreadyIncludedIds = new Set(problemIds.map(id => id.toString()));
+    const carryoverProblemIds = [];
+
+    for (const pastDoc of pastProgressDocs) {
+      // Find which past-day problems correspond to a schedule entry
+      const pastDayEntry = schedule.days.find((d) => {
+        const dStr = new Date(d.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
+        const pastDayStr = new Date(pastDoc.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
+        return dStr === pastDayStr;
+      });
+      if (!pastDayEntry) continue;
+
+      const pastCompletedIds = new Set((pastDoc.completed || []).map(c => c.problemId.toString()));
+      const pastAssignedIds = pastDayEntry.problems
+        ? pastDayEntry.problems.map(p => p.problemId.toString())
+        : (pastDayEntry.problemIds || []).map(id => id.toString());
+
+      for (const pid of pastAssignedIds) {
+        if (!pastCompletedIds.has(pid) && !alreadyIncludedIds.has(pid)) {
+          carryoverProblemIds.push(pid);
+          alreadyIncludedIds.add(pid); // prevent duplicates across multiple past days
+        }
+      }
+    }
+
+    if (carryoverProblemIds.length > 0) {
+      const carryoverProblems = await Problem.find({ _id: { $in: carryoverProblemIds } }).lean();
+      carryoverProblems.forEach((p) => {
+        enrichedProblems.push({
+          ...p,
+          isRevision: false,
+          isCarryover: true,
+          status: 'pending',
+          solved: completedIds.has(p._id.toString()),
+          bookmarked: bookmarkedIds.has(p._id.toString()),
+          note: notesMap[p._id.toString()] || '',
+        });
+      });
+    }
+    // === END CARRY-OVER ===
+
+    // Separate valid problems vs those without links (Research/practice only)
+    const isValidProblem = (p) => {
+      const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+      const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
+      return !!(validLc || validGfg);
+    };
+    const coreProblems = enrichedProblems.filter(isValidProblem);
+    const searchPractice = enrichedProblems.filter(p => !isValidProblem(p));
+
+    const solvedCount = coreProblems.filter(p => p.solved).length;
 
     res.json({
       success: true,
@@ -58,14 +118,16 @@ const getToday = async (req, res, next) => {
         dayNumber: dayEntry.dayNumber,
         date: dayEntry.date,
         type: dayEntry.type,
-        problems: enrichedProblems,
+        problems: coreProblems,
+        searchPractice: searchPractice,
+        carryoverCount: carryoverProblemIds.length,
         concepts: dayEntry.readings ? dayEntry.readings.map(r => r.title) : (dayEntry.concepts || []),
         readings: dayEntry.readings || [],
         isCompleted: dayEntry.isCompleted || false,
         progress: {
-          total: enrichedProblems.length,
+          total: coreProblems.length,
           completed: solvedCount,
-          allDone: solvedCount >= enrichedProblems.length && enrichedProblems.length > 0,
+          allDone: solvedCount >= coreProblems.length && coreProblems.length > 0,
         },
       },
     });
@@ -135,12 +197,41 @@ const getFullSchedule = async (req, res, next) => {
     const schedule = await Schedule.findOne({ userId: req.user._id })
       .populate('days.problems.problemId', 'name difficulty topic leetcodeSlug slug gfgUrl')
       .lean();
-    
+
     if (!schedule) {
       return next(createError('Schedule not found', 404, 'NO_SCHEDULE'));
     }
 
-    res.json({ success: true, data: schedule.days });
+    // Merge progress data so the calendar can colour days without a second API call
+    const progressDocs = await Progress.find({ userId: req.user._id })
+      .select('date allDone completed')
+      .lean();
+
+    const progressMap = {};
+    progressDocs.forEach((p) => {
+      const key = new Date(p.date).toISOString().split('T')[0];
+      progressMap[key] = { allDone: p.allDone, completedCount: p.completed.length };
+    });
+
+    const enrichedDays = schedule.days.map((d) => {
+      const key = new Date(d.date).toISOString().split('T')[0];
+      const prog = progressMap[key] || {};
+      return {
+        ...d,
+        allDone: prog.allDone || false,
+        completedCount: prog.completedCount || 0,
+        problemCount: d.problems ? d.problems.length : (d.problemIds?.length || 0),
+      };
+    });
+
+    // Mark days that follow a day with incomplete tasks
+    for (let i = 1; i < enrichedDays.length; i++) {
+      const prev = enrichedDays[i - 1];
+      const prevIsPast = new Date(prev.date) < new Date(new Date().toDateString());
+      enrichedDays[i].hasPrevIncomplete = prevIsPast && !prev.allDone && prev.problemCount > 0;
+    }
+
+    res.json({ success: true, data: enrichedDays });
   } catch (err) {
     next(err);
   }

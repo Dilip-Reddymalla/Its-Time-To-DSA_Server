@@ -91,16 +91,30 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
   const allAvailableProblems = await Problem.find({ _id: { $nin: excludeIds } }).lean();
   
   const pool = {};
+  const linklessPool = {};
+
   allAvailableProblems.forEach(p => {
-    if (!pool[p.topic]) pool[p.topic] = { Easy: [], Medium: [], Hard: [] };
-    if (!pool[p.topic][p.difficulty]) pool[p.topic][p.difficulty] = [];
-    pool[p.topic][p.difficulty].push(p);
+    const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+    const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
+    const isValid = !!(validLc || validGfg);
+
+    if (isValid) {
+      if (!pool[p.topic]) pool[p.topic] = { Easy: [], Medium: [], Hard: [] };
+      if (!pool[p.topic][p.difficulty]) pool[p.topic][p.difficulty] = [];
+      pool[p.topic][p.difficulty].push(p);
+    } else {
+      if (!linklessPool[p.topic]) linklessPool[p.topic] = [];
+      linklessPool[p.topic].push(p);
+    }
   });
 
   Object.keys(pool).forEach(topic => {
     Object.keys(pool[topic]).forEach(diff => {
       pool[topic][diff] = shuffleArray(pool[topic][diff]);
     });
+  });
+  Object.keys(linklessPool).forEach(topic => {
+    linklessPool[topic] = shuffleArray(linklessPool[topic]);
   });
 
   const assignedHistory = []; 
@@ -160,6 +174,16 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
         saturdayProblems.push(challengeProblem);
         assignedHistory.push(challengeProblem);
       }
+      
+      // Optionally inject a Search & Practice conceptual item into Saturday
+      const unexhaustedLinklessThemes = Object.keys(linklessPool).filter(t => linklessPool[t].length > 0);
+      if (unexhaustedLinklessThemes.length > 0) {
+        // pick a random topic from linkless pool
+        const randTopic = unexhaustedLinklessThemes[Math.floor(Math.random() * unexhaustedLinklessThemes.length)];
+        const searchProb = { ...linklessPool[randTopic].pop(), isRevision: false };
+        saturdayProblems.push(searchProb);
+        assignedHistory.push(searchProb);
+      }
 
       days.push({
         dayNumber: dayNum,
@@ -216,7 +240,17 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
       todayProblems = [...todayProblems, ...revs];
     }
 
-    todayProblems.filter(p => !p.isRevision).forEach(p => assignedHistory.push(p));
+    // Inject Search & Practice (Linkless) problems if available for this topic (1-2 per day)
+    if (linklessPool[primaryTopic] && linklessPool[primaryTopic].length > 0) {
+      // pop up to 1 linkless problem so it doesn't overwhelm the user
+      const searchProb = { ...linklessPool[primaryTopic].pop(), isRevision: false };
+      todayProblems.push(searchProb);
+    }
+
+    todayProblems.filter(p => !p.isRevision).forEach(p => {
+       // linkless problems shouldn't necessarily go to history, but it doesn't hurt.
+       assignedHistory.push(p);
+    });
 
     days.push({
       dayNumber: dayNum,

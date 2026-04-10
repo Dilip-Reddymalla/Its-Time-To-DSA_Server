@@ -1,5 +1,6 @@
 const Problem = require('../models/Problem');
 const Progress = require('../models/Progress');
+const axios = require('axios');
 const { createError } = require('../middleware/errorHandler');
 
 /**
@@ -74,7 +75,55 @@ const getFilterData = async (req, res, next) => {
   }
 };
 
+/**
+ * Validate a LeetCode problem slug — proxies through our server to dodge CORS.
+ * Returns { valid: true/false, gfgUrl } so the frontend can fall back to GFG.
+ */
+const validateLeetcodeSlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    if (!slug) return res.json({ valid: false });
+
+    // Fetch matching problem from DB first so we can return its GFG URL
+    const problem = await Problem.findOne({ leetcodeSlug: slug }).select('gfgUrl').lean();
+
+    const query = `
+      query questionData($titleSlug: String!) {
+        question(titleSlug: $titleSlug) {
+          questionId
+          title
+        }
+      }
+    `;
+
+    try {
+      const response = await axios.post(
+        'https://leetcode.com/graphql',
+        { query, variables: { titleSlug: slug } },
+        {
+          headers: { 'Content-Type': 'application/json', 'Referer': 'https://leetcode.com' },
+          timeout: 5000,
+        }
+      );
+
+      const question = response.data?.data?.question;
+      const valid = !!question?.questionId;
+
+      return res.json({
+        valid,
+        gfgUrl: problem?.gfgUrl || null,
+      });
+    } catch {
+      // If LeetCode GraphQL is unreachable, assume valid to avoid false negatives
+      return res.json({ valid: true, gfgUrl: problem?.gfgUrl || null });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getProblems,
-  getFilterData
+  getFilterData,
+  validateLeetcodeSlug,
 };

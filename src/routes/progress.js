@@ -6,6 +6,7 @@ const {
   markProblem,
   addNote,
   toggleBookmark,
+  getSolvedJournal,
 } = require('../controllers/progressController');
 
 const router = express.Router();
@@ -30,5 +31,7 @@ router.post(
   [body('problemId').notEmpty().isMongoId()],
   toggleBookmark
 );
+
+router.get('/journal', getSolvedJournal);
 
 module.exports = router;
