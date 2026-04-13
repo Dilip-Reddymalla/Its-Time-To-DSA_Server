@@ -52,35 +52,35 @@ const getToday = async (req, res, next) => {
     });
 
     // === CARRY-OVER: Append unsolved problems from past days ===
-    // Find all past Progress docs where NOT all problems were done
-    const pastProgressDocs = await Progress.find({
-      userId: req.user._id,
-      date: { $lt: dayStart },
-      allDone: { $ne: true },
-    }).lean();
-
-    // Collect problem IDs that were assigned but not completed on past days
     const alreadyIncludedIds = new Set(problemIds.map(id => id.toString()));
     const carryoverProblemIds = [];
 
-    for (const pastDoc of pastProgressDocs) {
-      // Find which past-day problems correspond to a schedule entry
-      const pastDayEntry = schedule.days.find((d) => {
-        const dStr = new Date(d.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
-        const pastDayStr = new Date(pastDoc.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
-        return dStr === pastDayStr;
-      });
-      if (!pastDayEntry) continue;
+    const allProgressDocs = await Progress.find({ userId: req.user._id }).lean();
+    
+    // We only care if the user completed the problem BEFORE today.
+    // If they completed it today, we STILL want it to carry-over to today's list so they can see it checked off!
+    const globalCompletedBeforeToday = new Set();
+    allProgressDocs.forEach((p) => {
+      const pDateStr = new Date(p.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
+      if (pDateStr < todayStr) {
+        (p.completed || []).forEach(c => globalCompletedBeforeToday.add(c.problemId.toString()));
+      }
+    });
 
-      const pastCompletedIds = new Set((pastDoc.completed || []).map(c => c.problemId.toString()));
-      const pastAssignedIds = pastDayEntry.problems
-        ? pastDayEntry.problems.map(p => p.problemId.toString())
-        : (pastDayEntry.problemIds || []).map(id => id.toString());
+    for (const pastDay of schedule.days) {
+      const pastDayStr = new Date(pastDay.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
+
+      // Skip today and future days
+      if (pastDayStr >= todayStr) continue;
+
+      const pastAssignedIds = pastDay.problems
+        ? pastDay.problems.map(p => p.problemId.toString())
+        : (pastDay.problemIds || []).map(id => id.toString());
 
       for (const pid of pastAssignedIds) {
-        if (!pastCompletedIds.has(pid) && !alreadyIncludedIds.has(pid)) {
+        if (!globalCompletedBeforeToday.has(pid) && !alreadyIncludedIds.has(pid)) {
           carryoverProblemIds.push(pid);
-          alreadyIncludedIds.add(pid); // prevent duplicates across multiple past days
+          alreadyIncludedIds.add(pid);
         }
       }
     }
@@ -110,7 +110,8 @@ const getToday = async (req, res, next) => {
     const coreProblems = enrichedProblems.filter(isValidProblem);
     const searchPractice = enrichedProblems.filter(p => !isValidProblem(p));
 
-    const solvedCount = coreProblems.filter(p => p.solved).length;
+    const requiredTotal = coreProblems.length;
+    const requiredCompleted = coreProblems.filter(p => p.solved).length;
 
     res.json({
       success: true,
@@ -125,9 +126,9 @@ const getToday = async (req, res, next) => {
         readings: dayEntry.readings || [],
         isCompleted: dayEntry.isCompleted || false,
         progress: {
-          total: coreProblems.length,
-          completed: solvedCount,
-          allDone: solvedCount >= coreProblems.length && coreProblems.length > 0,
+          total: requiredTotal,
+          completed: requiredCompleted,
+          allDone: requiredCompleted >= requiredTotal && requiredTotal > 0,
         },
       },
     });
@@ -195,7 +196,7 @@ const getOverview = async (req, res, next) => {
 const getFullSchedule = async (req, res, next) => {
   try {
     const schedule = await Schedule.findOne({ userId: req.user._id })
-      .populate('days.problems.problemId', 'name difficulty topic leetcodeSlug slug gfgUrl')
+      .populate('days.problems.problemId', 'name difficulty topic leetcodeSlug slug gfgUrl youtubeUrl resourceUrl source')
       .lean();
 
     if (!schedule) {

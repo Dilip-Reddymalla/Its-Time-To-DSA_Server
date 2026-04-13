@@ -9,6 +9,10 @@ const PHASE_BLUEPRINTS = [
   { percent: 0.20, topics: ['Dynamic Programming', 'Advanced Graphs'] },
 ];
 
+// Foundation topics ("Learn the basics", sorting fundamentals) are injected
+// into Saturday revision days as bonus practice — not regular learning days.
+const FOUNDATION_TOPIC = 'Foundation';
+
 const calculatePhases = (totalDays) => {
   let currentDay = 1;
   return PHASE_BLUEPRINTS.map((bp, index) => {
@@ -108,14 +112,34 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
     }
   });
 
+  // ── Sort each difficulty bucket so striver-a2z problems are at the END ──
+  // pop() picks from the end, so striver problems get picked FIRST.
+  const striverPriorityShuffle = (arr) => {
+    const nonStriver = shuffleArray(arr.filter(p => p.source !== 'striver-a2z'));
+    const striver = shuffleArray(arr.filter(p => p.source === 'striver-a2z'));
+    return [...nonStriver, ...striver]; // striver at end = popped first
+  };
+
   Object.keys(pool).forEach(topic => {
     Object.keys(pool[topic]).forEach(diff => {
-      pool[topic][diff] = shuffleArray(pool[topic][diff]);
+      pool[topic][diff] = striverPriorityShuffle(pool[topic][diff]);
     });
   });
   Object.keys(linklessPool).forEach(topic => {
     linklessPool[topic] = shuffleArray(linklessPool[topic]);
   });
+
+  // ── Foundation pool (separate) — used only on Saturdays ──
+  const foundationPool = { Easy: [], Medium: [], Hard: [] };
+  if (pool[FOUNDATION_TOPIC]) {
+    ['Easy', 'Medium', 'Hard'].forEach(diff => {
+      if (pool[FOUNDATION_TOPIC][diff]) {
+        foundationPool[diff] = [...pool[FOUNDATION_TOPIC][diff]];
+      }
+    });
+    // Remove Foundation from main pool so it doesn't leak into weekdays
+    delete pool[FOUNDATION_TOPIC];
+  }
 
   const assignedHistory = []; 
   const hardQuotaTracker = {}; // NEW: Tracks how many Hard questions assigned per topic
@@ -173,6 +197,20 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
       if (challengeProblem) {
         saturdayProblems.push(challengeProblem);
         assignedHistory.push(challengeProblem);
+      }
+
+      // ── Foundation Bonus: Inject 1-2 basics/sorting problems as extra effort ──
+      const foundationCount = dailyGoal === 'light' ? 1 : 2;
+      for (let fi = 0; fi < foundationCount; fi++) {
+        // Prefer Easy first, then Medium
+        for (const diff of ['Easy', 'Medium', 'Hard']) {
+          if (foundationPool[diff] && foundationPool[diff].length > 0) {
+            const fp = { ...foundationPool[diff].pop(), isRevision: false, isFoundation: true };
+            saturdayProblems.push(fp);
+            assignedHistory.push(fp);
+            break;
+          }
+        }
       }
       
       // Optionally inject a Search & Practice conceptual item into Saturday

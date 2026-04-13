@@ -1,0 +1,2171 @@
+[
+  {
+    "topic": "Learn the basics",
+    "question": "Reverse Integer",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/reverse-integer",
+    "youtube": "https://www.youtube.com/results?search_query=Reverse+Integer+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Palindrome Number",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/palindrome-number",
+    "youtube": "https://www.youtube.com/results?search_query=Palindrome+Number+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Armstrong Number",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/armstrong-number",
+    "youtube": "https://www.youtube.com/results?search_query=Armstrong+Number+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Valid Palindrome",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/valid-palindrome",
+    "youtube": "https://www.youtube.com/results?search_query=Valid+Palindrome+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Fibonacci Number",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/fibonacci-number",
+    "youtube": "https://www.youtube.com/results?search_query=Fibonacci+Number+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Frequency Of The Most Frequent Element",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/frequency-of-the-most-frequent-element",
+    "youtube": "https://www.youtube.com/results?search_query=Frequency+Of+The+Most+Frequent+Element+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Check If Array Is Sorted And Rotated",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/check-if-array-is-sorted-and-rotated",
+    "youtube": "https://www.youtube.com/results?search_query=Check+If+Array+Is+Sorted+And+Rotated+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Remove Duplicates From Sorted Array",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/remove-duplicates-from-sorted-array",
+    "youtube": "https://www.youtube.com/results?search_query=Remove+Duplicates+From+Sorted+Array+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Rotate Array",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/rotate-array",
+    "youtube": "https://www.youtube.com/results?search_query=Rotate+Array+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Move Zeroes",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/move-zeroes",
+    "youtube": "https://www.youtube.com/results?search_query=Move+Zeroes+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Max Consecutive Ones",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/max-consecutive-ones",
+    "youtube": "https://www.youtube.com/results?search_query=Max+Consecutive+Ones+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Single Number",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/single-number",
+    "youtube": "https://www.youtube.com/results?search_query=Single+Number+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Two Sum",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/two-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Two+Sum+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Sort Colors",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sort-colors",
+    "youtube": "https://www.youtube.com/results?search_query=Sort+Colors+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Majority Element",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/majority-element",
+    "youtube": "https://www.youtube.com/results?search_query=Majority+Element+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Maximum Subarray",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-subarray",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Subarray+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Best Time To Buy And Sell Stock",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock",
+    "youtube": "https://www.youtube.com/results?search_query=Best+Time+To+Buy+And+Sell+Stock+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Rearrange Array Elements By Sign",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/rearrange-array-elements-by-sign",
+    "youtube": "https://www.youtube.com/results?search_query=Rearrange+Array+Elements+By+Sign+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Next Permutation",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/next-permutation",
+    "youtube": "https://www.youtube.com/results?search_query=Next+Permutation+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Longest Consecutive Sequence",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-consecutive-sequence",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Consecutive+Sequence+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Set Matrix Zeroes",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/set-matrix-zeroes",
+    "youtube": "https://www.youtube.com/results?search_query=Set+Matrix+Zeroes+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Rotate Image",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/rotate-image",
+    "youtube": "https://www.youtube.com/results?search_query=Rotate+Image+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Spiral Matrix",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/spiral-matrix",
+    "youtube": "https://www.youtube.com/results?search_query=Spiral+Matrix+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Subarray Sum Equals K",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/subarray-sum-equals-k",
+    "youtube": "https://www.youtube.com/results?search_query=Subarray+Sum+Equals+K+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Pascals Triangle",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/pascals-triangle",
+    "youtube": "https://www.youtube.com/results?search_query=Pascals+Triangle+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Majority Element Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/majority-element-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Majority+Element+Ii+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "3Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/3sum",
+    "youtube": "https://www.youtube.com/results?search_query=3Sum+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "4Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/4sum",
+    "youtube": "https://www.youtube.com/results?search_query=4Sum+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Merge Intervals",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/merge-intervals",
+    "youtube": "https://www.youtube.com/results?search_query=Merge+Intervals+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Merge Sorted Array",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/merge-sorted-array",
+    "youtube": "https://www.youtube.com/results?search_query=Merge+Sorted+Array+striver"
+  },
+  {
+    "topic": "Learn the basics",
+    "question": "Reverse Pairs",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/reverse-pairs",
+    "youtube": "https://www.youtube.com/results?search_query=Reverse+Pairs+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Maximum Product Subarray",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-product-subarray",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Product+Subarray+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Binary Search",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-search",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Search+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Search Insert Position",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/search-insert-position",
+    "youtube": "https://www.youtube.com/results?search_query=Search+Insert+Position+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Find First And Last Position Of Element In Sorted Array",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array",
+    "youtube": "https://www.youtube.com/results?search_query=Find+First+And+Last+Position+Of+Element+In+Sorted+Array+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Search In Rotated Sorted Array",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/search-in-rotated-sorted-array",
+    "youtube": "https://www.youtube.com/results?search_query=Search+In+Rotated+Sorted+Array+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Search In Rotated Sorted Array Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/search-in-rotated-sorted-array-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Search+In+Rotated+Sorted+Array+Ii+striver"
+  },
+  {
+    "topic": "Learn Important Sorting Techniques",
+    "question": "Find Minimum In Rotated Sorted Array",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array",
+    "youtube": "https://www.youtube.com/results?search_query=Find+Minimum+In+Rotated+Sorted+Array+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Single Element In A Sorted Array",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/single-element-in-a-sorted-array",
+    "youtube": "https://www.youtube.com/results?search_query=Single+Element+In+A+Sorted+Array+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Find Peak Element",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-peak-element",
+    "youtube": "https://www.youtube.com/results?search_query=Find+Peak+Element+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Koko Eating Bananas",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/koko-eating-bananas",
+    "youtube": "https://www.youtube.com/results?search_query=Koko+Eating+Bananas+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Minimum Number Of Days To Make M Bouquets",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Number+Of+Days+To+Make+M+Bouquets+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Find The Smallest Divisor Given A Threshold",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold",
+    "youtube": "https://www.youtube.com/results?search_query=Find+The+Smallest+Divisor+Given+A+Threshold+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Capacity To Ship Packages Within D Days",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days",
+    "youtube": "https://www.youtube.com/results?search_query=Capacity+To+Ship+Packages+Within+D+Days+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Kth Missing Positive Number",
+    "difficulty": "Easy",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/kth-missing-positive-number",
+    "youtube": "https://www.youtube.com/results?search_query=Kth+Missing+Positive+Number+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Split Array Largest Sum",
+    "difficulty": "Hard",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/split-array-largest-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Split+Array+Largest+Sum+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Minimize Max Distance To Gas Station",
+    "difficulty": "Hard",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimize-max-distance-to-gas-station",
+    "youtube": "https://www.youtube.com/results?search_query=Minimize+Max+Distance+To+Gas+Station+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Median Of Two Sorted Arrays",
+    "difficulty": "Hard",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/median-of-two-sorted-arrays",
+    "youtube": "https://www.youtube.com/results?search_query=Median+Of+Two+Sorted+Arrays+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Search A 2D Matrix",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/search-a-2d-matrix",
+    "youtube": "https://www.youtube.com/results?search_query=Search+A+2D+Matrix+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Search A 2D Matrix Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/search-a-2d-matrix-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Search+A+2D+Matrix+Ii+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Find A Peak Element Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-a-peak-element-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Find+A+Peak+Element+Ii+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Remove Outermost Parentheses",
+    "difficulty": "Easy",
+    "striver_difficulty": "Easy",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/remove-outermost-parentheses",
+    "youtube": "https://www.youtube.com/results?search_query=Remove+Outermost+Parentheses+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Reverse Words In A String",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/reverse-words-in-a-string",
+    "youtube": "https://www.youtube.com/results?search_query=Reverse+Words+In+A+String+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Largest Odd Number In String",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/largest-odd-number-in-string",
+    "youtube": "https://www.youtube.com/results?search_query=Largest+Odd+Number+In+String+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Longest Common Prefix",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-common-prefix",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Common+Prefix+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Isomorphic Strings",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/isomorphic-strings",
+    "youtube": "https://www.youtube.com/results?search_query=Isomorphic+Strings+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Rotate String",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/rotate-string",
+    "youtube": "https://www.youtube.com/results?search_query=Rotate+String+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Valid Anagram",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/valid-anagram",
+    "youtube": "https://www.youtube.com/results?search_query=Valid+Anagram+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Sort Characters By Frequency",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sort-characters-by-frequency",
+    "youtube": "https://www.youtube.com/results?search_query=Sort+Characters+By+Frequency+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Maximum Nesting Depth Of The Parentheses",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-nesting-depth-of-the-parentheses",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Nesting+Depth+Of+The+Parentheses+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Roman To Integer",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/roman-to-integer",
+    "youtube": "https://www.youtube.com/results?search_query=Roman+To+Integer+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "String To Integer Atoi",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/string-to-integer-atoi",
+    "youtube": "https://www.youtube.com/results?search_query=String+To+Integer+Atoi+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Longest Palindromic Substring",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-palindromic-substring",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Palindromic+Substring+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Sum Of Beauty Of All Substrings",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sum-of-beauty-of-all-substrings",
+    "youtube": "https://www.youtube.com/results?search_query=Sum+Of+Beauty+Of+All+Substrings+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Delete Node In A Linked List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/delete-node-in-a-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Delete+Node+In+A+Linked+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Middle Of The Linked List",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/middle-of-the-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Middle+Of+The+Linked+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Reverse Linked List",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/reverse-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Reverse+Linked+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Linked List Cycle",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/linked-list-cycle",
+    "youtube": "https://www.youtube.com/results?search_query=Linked+List+Cycle+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Linked List Cycle Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/linked-list-cycle-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Linked+List+Cycle+Ii+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Palindrome Linked List",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/palindrome-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Palindrome+Linked+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Odd Even Linked List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/odd-even-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Odd+Even+Linked+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Remove Nth Node From End Of List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/remove-nth-node-from-end-of-list",
+    "youtube": "https://www.youtube.com/results?search_query=Remove+Nth+Node+From+End+Of+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Delete The Middle Node Of A Linked List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Delete+The+Middle+Node+Of+A+Linked+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Sort List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sort-list",
+    "youtube": "https://www.youtube.com/results?search_query=Sort+List+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Intersection Of Two Linked Lists",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/intersection-of-two-linked-lists",
+    "youtube": "https://www.youtube.com/results?search_query=Intersection+Of+Two+Linked+Lists+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Add Two Numbers",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/add-two-numbers",
+    "youtube": "https://www.youtube.com/results?search_query=Add+Two+Numbers+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Reverse Nodes In K Group",
+    "difficulty": "Hard",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/reverse-nodes-in-k-group",
+    "youtube": "https://www.youtube.com/results?search_query=Reverse+Nodes+In+K+Group+striver"
+  },
+  {
+    "topic": "Solve Problems on Arrays",
+    "question": "Rotate List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/rotate-list",
+    "youtube": "https://www.youtube.com/results?search_query=Rotate+List+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Copy List With Random Pointer",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/copy-list-with-random-pointer",
+    "youtube": "https://www.youtube.com/results?search_query=Copy+List+With+Random+Pointer+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Powx N",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/powx-n",
+    "youtube": "https://www.youtube.com/results?search_query=Powx+N+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Count Good Numbers",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/count-good-numbers",
+    "youtube": "https://www.youtube.com/results?search_query=Count+Good+Numbers+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Generate Parentheses",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/generate-parentheses",
+    "youtube": "https://www.youtube.com/results?search_query=Generate+Parentheses+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Combination Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/combination-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Combination+Sum+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Combination Sum Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/combination-sum-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Combination+Sum+Ii+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Subsets Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/subsets-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Subsets+Ii+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Combination Sum Iii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/combination-sum-iii",
+    "youtube": "https://www.youtube.com/results?search_query=Combination+Sum+Iii+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Letter Combinations Of A Phone Number",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/letter-combinations-of-a-phone-number",
+    "youtube": "https://www.youtube.com/results?search_query=Letter+Combinations+Of+A+Phone+Number+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Word Search",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/word-search",
+    "youtube": "https://www.youtube.com/results?search_query=Word+Search+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "N Queens",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/n-queens",
+    "youtube": "https://www.youtube.com/results?search_query=N+Queens+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Sudoku Solver",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sudoku-solver",
+    "youtube": "https://www.youtube.com/results?search_query=Sudoku+Solver+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Expression Add Operators",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/expression-add-operators",
+    "youtube": "https://www.youtube.com/results?search_query=Expression+Add+Operators+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Power Of Two",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/power-of-two",
+    "youtube": "https://www.youtube.com/results?search_query=Power+Of+Two+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Divide Two Integers",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/divide-two-integers",
+    "youtube": "https://www.youtube.com/results?search_query=Divide+Two+Integers+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Minimum Bit Flips To Convert Number",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-bit-flips-to-convert-number",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Bit+Flips+To+Convert+Number+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Subsets",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/subsets",
+    "youtube": "https://www.youtube.com/results?search_query=Subsets+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Count Primes",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/count-primes",
+    "youtube": "https://www.youtube.com/results?search_query=Count+Primes+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Implement Stack Using Queues",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/implement-stack-using-queues",
+    "youtube": "https://www.youtube.com/results?search_query=Implement+Stack+Using+Queues+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Implement Queue Using Stacks",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/implement-queue-using-stacks",
+    "youtube": "https://www.youtube.com/results?search_query=Implement+Queue+Using+Stacks+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Valid Parentheses",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/valid-parentheses",
+    "youtube": "https://www.youtube.com/results?search_query=Valid+Parentheses+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Min Stack",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/min-stack",
+    "youtube": "https://www.youtube.com/results?search_query=Min+Stack+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Next Greater Element I",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/next-greater-element-i",
+    "youtube": "https://www.youtube.com/results?search_query=Next+Greater+Element+I+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Next Greater Element Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/next-greater-element-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Next+Greater+Element+Ii+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Trapping Rain Water",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/trapping-rain-water",
+    "youtube": "https://www.youtube.com/results?search_query=Trapping+Rain+Water+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Sum Of Subarray Minimums",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sum-of-subarray-minimums",
+    "youtube": "https://www.youtube.com/results?search_query=Sum+Of+Subarray+Minimums+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Asteroid Collision",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/asteroid-collision",
+    "youtube": "https://www.youtube.com/results?search_query=Asteroid+Collision+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Sum Of Subarray Ranges",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sum-of-subarray-ranges",
+    "youtube": "https://www.youtube.com/results?search_query=Sum+Of+Subarray+Ranges+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Remove K Digits",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/remove-k-digits",
+    "youtube": "https://www.youtube.com/results?search_query=Remove+K+Digits+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Largest Rectangle In Histogram",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/largest-rectangle-in-histogram",
+    "youtube": "https://www.youtube.com/results?search_query=Largest+Rectangle+In+Histogram+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Maximal Rectangle",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximal-rectangle",
+    "youtube": "https://www.youtube.com/results?search_query=Maximal+Rectangle+striver"
+  },
+  {
+    "topic": "Binary Search",
+    "question": "Sliding Window Maximum",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/sliding-window-maximum",
+    "youtube": "https://www.youtube.com/results?search_query=Sliding+Window+Maximum+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Online Stock Span",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/online-stock-span",
+    "youtube": "https://www.youtube.com/results?search_query=Online+Stock+Span+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Lfu Cache",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/lfu-cache",
+    "youtube": "https://www.youtube.com/results?search_query=Lfu+Cache+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Longest Substring Without Repeating Characters",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-substring-without-repeating-characters",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Substring+Without+Repeating+Characters+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Max Consecutive Ones Iii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/max-consecutive-ones-iii",
+    "youtube": "https://www.youtube.com/results?search_query=Max+Consecutive+Ones+Iii+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Longest Repeating Character Replacement",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-repeating-character-replacement",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Repeating+Character+Replacement+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Binary Subarrays With Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-subarrays-with-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Subarrays+With+Sum+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Count Number Of Nice Subarrays",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/count-number-of-nice-subarrays",
+    "youtube": "https://www.youtube.com/results?search_query=Count+Number+Of+Nice+Subarrays+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Number Of Substrings Containing All Three Characters",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-substrings-containing-all-three-characters",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Substrings+Containing+All+Three+Characters+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Maximum Points You Can Obtain From Cards",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Points+You+Can+Obtain+From+Cards+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Longest Substring With At Most K Distinct Characters",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Substring+With+At+Most+K+Distinct+Characters+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Subarrays With K Different Integers",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/subarrays-with-k-different-integers",
+    "youtube": "https://www.youtube.com/results?search_query=Subarrays+With+K+Different+Integers+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Minimum Window Substring",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-window-substring",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Window+Substring+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Minimum Window Subsequence",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-window-subsequence",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Window+Subsequence+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Merge K Sorted Lists",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/merge-k-sorted-lists",
+    "youtube": "https://www.youtube.com/results?search_query=Merge+K+Sorted+Lists+striver"
+  },
+  {
+    "topic": "Strings",
+    "question": "Task Scheduler",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/task-scheduler",
+    "youtube": "https://www.youtube.com/results?search_query=Task+Scheduler+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Hand Of Straights",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/hand-of-straights",
+    "youtube": "https://www.youtube.com/results?search_query=Hand+Of+Straights+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Design Twitter",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/design-twitter",
+    "youtube": "https://www.youtube.com/results?search_query=Design+Twitter+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Kth Largest Element In A Stream",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/kth-largest-element-in-a-stream",
+    "youtube": "https://www.youtube.com/results?search_query=Kth+Largest+Element+In+A+Stream+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Find Median From Data Stream",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-median-from-data-stream",
+    "youtube": "https://www.youtube.com/results?search_query=Find+Median+From+Data+Stream+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Top K Frequent Elements",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/top-k-frequent-elements",
+    "youtube": "https://www.youtube.com/results?search_query=Top+K+Frequent+Elements+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Assign Cookies",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/assign-cookies",
+    "youtube": "https://www.youtube.com/results?search_query=Assign+Cookies+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Coin Change",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/coin-change",
+    "youtube": "https://www.youtube.com/results?search_query=Coin+Change+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Lemonade Change",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/lemonade-change",
+    "youtube": "https://www.youtube.com/results?search_query=Lemonade+Change+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Valid Parenthesis String",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/valid-parenthesis-string",
+    "youtube": "https://www.youtube.com/results?search_query=Valid+Parenthesis+String+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Jump Game",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/jump-game",
+    "youtube": "https://www.youtube.com/results?search_query=Jump+Game+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Jump Game Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/jump-game-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Jump+Game+Ii+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Candy",
+    "difficulty": "Hard",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/candy",
+    "youtube": "https://www.youtube.com/results?search_query=Candy+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Insert Interval",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/insert-interval",
+    "youtube": "https://www.youtube.com/results?search_query=Insert+Interval+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Non Overlapping Intervals",
+    "difficulty": "Medium",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/non-overlapping-intervals",
+    "youtube": "https://www.youtube.com/results?search_query=Non+Overlapping+Intervals+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Preorder Traversal",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-preorder-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Preorder+Traversal+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Inorder Traversal",
+    "difficulty": "Easy",
+    "striver_difficulty": "Medium",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-inorder-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Inorder+Traversal+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Postorder Traversal",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-postorder-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Postorder+Traversal+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Level Order Traversal",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-level-order-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Level+Order+Traversal+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Maximum Depth Of Binary Tree",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-depth-of-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Depth+Of+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Balanced Binary Tree",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/balanced-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Balanced+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Diameter Of Binary Tree",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/diameter-of-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Diameter+Of+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Maximum Path Sum",
+    "difficulty": "Hard",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-maximum-path-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Maximum+Path+Sum+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Same Tree",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/same-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Same+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Zigzag Level Order Traversal",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Zigzag+Level+Order+Traversal+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Boundary Of Binary Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/boundary-of-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Boundary+Of+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Vertical Order Traversal Of A Binary Tree",
+    "difficulty": "Hard",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Vertical+Order+Traversal+Of+A+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Binary Tree Right Side View",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-tree-right-side-view",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Tree+Right+Side+View+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Symmetric Tree",
+    "difficulty": "Easy",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/symmetric-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Symmetric+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Lowest Common Ancestor Of A Binary Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Lowest+Common+Ancestor+Of+A+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "Maximum Width Of Binary Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-width-of-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Width+Of+Binary+Tree+striver"
+  },
+  {
+    "topic": "Learn LinkedList",
+    "question": "All Nodes Distance K In Binary Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Hard",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=All+Nodes+Distance+K+In+Binary+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Count Complete Tree Nodes",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/count-complete-tree-nodes",
+    "youtube": "https://www.youtube.com/results?search_query=Count+Complete+Tree+Nodes+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Construct Binary Tree From Preorder And Inorder Traversal",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Construct+Binary+Tree+From+Preorder+And+Inorder+Traversal+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Construct Binary Tree From Inorder And Postorder Traversal",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Construct+Binary+Tree+From+Inorder+And+Postorder+Traversal+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Serialize And Deserialize Binary Tree",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Serialize+And+Deserialize+Binary+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Flatten Binary Tree To Linked List",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/flatten-binary-tree-to-linked-list",
+    "youtube": "https://www.youtube.com/results?search_query=Flatten+Binary+Tree+To+Linked+List+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Search In A Binary Search Tree",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/search-in-a-binary-search-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Search+In+A+Binary+Search+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Insert Into A Binary Search Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/insert-into-a-binary-search-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Insert+Into+A+Binary+Search+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Delete Node In A Bst",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/delete-node-in-a-bst",
+    "youtube": "https://www.youtube.com/results?search_query=Delete+Node+In+A+Bst+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Kth Smallest Element In A Bst",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/kth-smallest-element-in-a-bst",
+    "youtube": "https://www.youtube.com/results?search_query=Kth+Smallest+Element+In+A+Bst+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Validate Binary Search Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/validate-binary-search-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Validate+Binary+Search+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Lowest Common Ancestor Of A Binary Search Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Lowest+Common+Ancestor+Of+A+Binary+Search+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Construct Binary Search Tree From Preorder Traversal",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/construct-binary-search-tree-from-preorder-traversal",
+    "youtube": "https://www.youtube.com/results?search_query=Construct+Binary+Search+Tree+From+Preorder+Traversal+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Inorder Successor In Bst",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/inorder-successor-in-bst",
+    "youtube": "https://www.youtube.com/results?search_query=Inorder+Successor+In+Bst+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Binary Search Tree Iterator",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/binary-search-tree-iterator",
+    "youtube": "https://www.youtube.com/results?search_query=Binary+Search+Tree+Iterator+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Two Sum Iv Input Is A Bst",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/two-sum-iv-input-is-a-bst",
+    "youtube": "https://www.youtube.com/results?search_query=Two+Sum+Iv+Input+Is+A+Bst+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Recover Binary Search Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/recover-binary-search-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Recover+Binary+Search+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Maximum Sum Bst In Binary Tree",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-sum-bst-in-binary-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Sum+Bst+In+Binary+Tree+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Nu",
+    "difficulty": "Unknown",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/nu",
+    "youtube": "https://www.youtube.com/results?search_query=Nu+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Rotting Oranges",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/rotting-oranges",
+    "youtube": "https://www.youtube.com/results?search_query=Rotting+Oranges+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Flood Fill",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/flood-fill",
+    "youtube": "https://www.youtube.com/results?search_query=Flood+Fill+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Course Schedule",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/course-schedule",
+    "youtube": "https://www.youtube.com/results?search_query=Course+Schedule+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "01 Matrix",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/01-matrix",
+    "youtube": "https://www.youtube.com/results?search_query=01+Matrix+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Surrounded Regions",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/surrounded-regions",
+    "youtube": "https://www.youtube.com/results?search_query=Surrounded+Regions+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Number Of Enclaves",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-enclaves",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Enclaves+striver"
+  },
+  {
+    "topic": "Recursion",
+    "question": "Word Ladder",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/word-ladder",
+    "youtube": "https://www.youtube.com/results?search_query=Word+Ladder+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Word Ladder Ii",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/word-ladder-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Word+Ladder+Ii+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Number Of Islands",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-islands",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Islands+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Is Graph Bipartite",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/is-graph-bipartite",
+    "youtube": "https://www.youtube.com/results?search_query=Is+Graph+Bipartite+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Course Schedule Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/course-schedule-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Course+Schedule+Ii+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Find Eventual Safe States",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-eventual-safe-states",
+    "youtube": "https://www.youtube.com/results?search_query=Find+Eventual+Safe+States+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Alien Dictionary",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/alien-dictionary",
+    "youtube": "https://www.youtube.com/results?search_query=Alien+Dictionary+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Shortest Path In Binary Matrix",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/shortest-path-in-binary-matrix",
+    "youtube": "https://www.youtube.com/results?search_query=Shortest+Path+In+Binary+Matrix+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Path With Minimum Effort",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/path-with-minimum-effort",
+    "youtube": "https://www.youtube.com/results?search_query=Path+With+Minimum+Effort+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Cheapest Flights Within K Stops",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/cheapest-flights-within-k-stops",
+    "youtube": "https://www.youtube.com/results?search_query=Cheapest+Flights+Within+K+Stops+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Network Delay Time",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/network-delay-time",
+    "youtube": "https://www.youtube.com/results?search_query=Network+Delay+Time+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Number Of Ways To Arrive At Destination",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-ways-to-arrive-at-destination",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Ways+To+Arrive+At+Destination+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Find The City With The Smallest Number Of Neighbors At A Threshold Distance",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance",
+    "youtube": "https://www.youtube.com/results?search_query=Find+The+City+With+The+Smallest+Number+Of+Neighbors+At+A+Threshold+Distance+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Number Of Operations To Make Network Connected",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-operations-to-make-network-connected",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Operations+To+Make+Network+Connected+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Most Stones Removed With Same Row Or Column",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/most-stones-removed-with-same-row-or-column",
+    "youtube": "https://www.youtube.com/results?search_query=Most+Stones+Removed+With+Same+Row+Or+Column+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Accounts Merge",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/accounts-merge",
+    "youtube": "https://www.youtube.com/results?search_query=Accounts+Merge+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Number Of Islands Ii",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-islands-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Islands+Ii+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Making A Large Island",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/making-a-large-island",
+    "youtube": "https://www.youtube.com/results?search_query=Making+A+Large+Island+striver"
+  },
+  {
+    "topic": "Bit Manipulation",
+    "question": "Swim In Rising Water",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/swim-in-rising-water",
+    "youtube": "https://www.youtube.com/results?search_query=Swim+In+Rising+Water+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Critical Connections In A Network",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/critical-connections-in-a-network",
+    "youtube": "https://www.youtube.com/results?search_query=Critical+Connections+In+A+Network+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Maximum Number Of Non Overlapping Substrings",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-number-of-non-overlapping-substrings",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Number+Of+Non+Overlapping+Substrings+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Climbing Stairs",
+    "difficulty": "Easy",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/climbing-stairs",
+    "youtube": "https://www.youtube.com/results?search_query=Climbing+Stairs+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "House Robber",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/house-robber",
+    "youtube": "https://www.youtube.com/results?search_query=House+Robber+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "House Robber Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/house-robber-ii",
+    "youtube": "https://www.youtube.com/results?search_query=House+Robber+Ii+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Unique Paths",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/unique-paths",
+    "youtube": "https://www.youtube.com/results?search_query=Unique+Paths+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Unique Paths Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/unique-paths-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Unique+Paths+Ii+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Minimum Path Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-path-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Path+Sum+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Triangle",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/triangle",
+    "youtube": "https://www.youtube.com/results?search_query=Triangle+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Partition Equal Subset Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/partition-equal-subset-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Partition+Equal+Subset+Sum+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Partition Array Into Two Arrays To Minimize Sum Difference",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference",
+    "youtube": "https://www.youtube.com/results?search_query=Partition+Array+Into+Two+Arrays+To+Minimize+Sum+Difference+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Target Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/target-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Target+Sum+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Coin Change 2",
+    "difficulty": "Unknown",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/coin-change-2",
+    "youtube": "https://www.youtube.com/results?search_query=Coin+Change+2+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Longest Palindromic Subsequence",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-palindromic-subsequence",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Palindromic+Subsequence+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Minimum Insertion Steps To Make A String Palindrome",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Insertion+Steps+To+Make+A+String+Palindrome+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Delete Operation For Two Strings",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/delete-operation-for-two-strings",
+    "youtube": "https://www.youtube.com/results?search_query=Delete+Operation+For+Two+Strings+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Shortest Common Supersequence",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/shortest-common-supersequence",
+    "youtube": "https://www.youtube.com/results?search_query=Shortest+Common+Supersequence+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Distinct Subsequences",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/distinct-subsequences",
+    "youtube": "https://www.youtube.com/results?search_query=Distinct+Subsequences+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Edit Distance",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/edit-distance",
+    "youtube": "https://www.youtube.com/results?search_query=Edit+Distance+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Wildcard Matching",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/wildcard-matching",
+    "youtube": "https://www.youtube.com/results?search_query=Wildcard+Matching+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Best Time To Buy And Sell Stock Ii",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Best+Time+To+Buy+And+Sell+Stock+Ii+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Best Time To Buy And Sell Stock Iii",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii",
+    "youtube": "https://www.youtube.com/results?search_query=Best+Time+To+Buy+And+Sell+Stock+Iii+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Best Time To Buy And Sell Stock Iv",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv",
+    "youtube": "https://www.youtube.com/results?search_query=Best+Time+To+Buy+And+Sell+Stock+Iv+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Best Time To Buy And Sell Stock With Cooldown",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown",
+    "youtube": "https://www.youtube.com/results?search_query=Best+Time+To+Buy+And+Sell+Stock+With+Cooldown+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Best Time To Buy And Sell Stock With Transaction Fee",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee",
+    "youtube": "https://www.youtube.com/results?search_query=Best+Time+To+Buy+And+Sell+Stock+With+Transaction+Fee+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Largest Divisible Subset",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/largest-divisible-subset",
+    "youtube": "https://www.youtube.com/results?search_query=Largest+Divisible+Subset+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Longest String Chain",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-string-chain",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+String+Chain+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Number Of Longest Increasing Subsequence",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/number-of-longest-increasing-subsequence",
+    "youtube": "https://www.youtube.com/results?search_query=Number+Of+Longest+Increasing+Subsequence+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Minimum Cost To Cut A Stick",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-cost-to-cut-a-stick",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Cost+To+Cut+A+Stick+striver"
+  },
+  {
+    "topic": "Stack and Queues",
+    "question": "Burst Balloons",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/burst-balloons",
+    "youtube": "https://www.youtube.com/results?search_query=Burst+Balloons+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Parsing A Boolean Expression",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/parsing-a-boolean-expression",
+    "youtube": "https://www.youtube.com/results?search_query=Parsing+A+Boolean+Expression+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Palindrome Partitioning Ii",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/palindrome-partitioning-ii",
+    "youtube": "https://www.youtube.com/results?search_query=Palindrome+Partitioning+Ii+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Partition Array For Maximum Sum",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/partition-array-for-maximum-sum",
+    "youtube": "https://www.youtube.com/results?search_query=Partition+Array+For+Maximum+Sum+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Count Square Submatrices With All Ones",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/count-square-submatrices-with-all-ones",
+    "youtube": "https://www.youtube.com/results?search_query=Count+Square+Submatrices+With+All+Ones+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Implement Trie Prefix Tree",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/implement-trie-prefix-tree",
+    "youtube": "https://www.youtube.com/results?search_query=Implement+Trie+Prefix+Tree+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Maximum Xor Of Two Numbers In An Array",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Xor+Of+Two+Numbers+In+An+Array+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Maximum Xor With An Element From Array",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/maximum-xor-with-an-element-from-array",
+    "youtube": "https://www.youtube.com/results?search_query=Maximum+Xor+With+An+Element+From+Array+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Minimum Add To Make Parentheses Valid",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/minimum-add-to-make-parentheses-valid",
+    "youtube": "https://www.youtube.com/results?search_query=Minimum+Add+To+Make+Parentheses+Valid+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Repeated String Match",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/repeated-string-match",
+    "youtube": "https://www.youtube.com/results?search_query=Repeated+String+Match+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Implement Strstr",
+    "difficulty": "Unknown",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/implement-strstr",
+    "youtube": "https://www.youtube.com/results?search_query=Implement+Strstr+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Longest Happy Prefix",
+    "difficulty": "Hard",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/longest-happy-prefix",
+    "youtube": "https://www.youtube.com/results?search_query=Longest+Happy+Prefix+striver"
+  },
+  {
+    "topic": "Sliding Window & Two Pointer Combined Problems",
+    "question": "Palindromic Substrings",
+    "difficulty": "Medium",
+    "striver_difficulty": "Unknown",
+    "platform": "LeetCode",
+    "link": "https://leetcode.com/problems/palindromic-substrings",
+    "youtube": "https://www.youtube.com/results?search_query=Palindromic+Substrings+striver"
+  }
+]

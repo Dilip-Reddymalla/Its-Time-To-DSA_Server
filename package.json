@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "npx nodemon server.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "sync:striver": "node scripts/sync_striver.js"
   },
   "engines": {
     "node": ">=18.0.0"

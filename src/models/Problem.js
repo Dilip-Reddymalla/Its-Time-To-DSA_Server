@@ -14,6 +14,8 @@ const problemSchema = new mongoose.Schema(
     leetcodeSlug: { type: String, trim: true, default: null },
     gfgUrl: { type: String, trim: true, default: null },
     resourceUrl: { type: String, default: null },
+    youtubeUrl: { type: String, trim: true, default: null },
+    striverTopic: { type: String, default: null },
     source: {
       type: String,
       enum: ['striver-a2z', 'neetcode', 'custom', 'google-sheet'],

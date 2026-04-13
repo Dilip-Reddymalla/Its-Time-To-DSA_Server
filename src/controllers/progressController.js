@@ -200,7 +200,7 @@ const getSolvedJournal = async (req, res, next) => {
 
     // Fetch problem details in one shot
     const problems = await Problem.find({ _id: { $in: [...allProblemIds] } })
-      .select('name difficulty topic leetcodeSlug gfgUrl slug')
+      .select('name difficulty topic leetcodeSlug gfgUrl slug youtubeUrl resourceUrl')
       .lean();
     const problemMap = {};
     problems.forEach((p) => { problemMap[p._id.toString()] = p; });
@@ -227,6 +227,8 @@ const getSolvedJournal = async (req, res, next) => {
             topic: p.topic,
             leetcodeSlug: p.leetcodeSlug || null,
             gfgUrl: p.gfgUrl || null,
+            youtubeUrl: p.youtubeUrl || null,
+            resourceUrl: p.resourceUrl || null,
             solvedAt: c.solvedAt,
             note: notesLookup[c.problemId.toString()]?.text || '',
             noteUpdatedAt: notesLookup[c.problemId.toString()]?.updatedAt || null,
