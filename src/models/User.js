@@ -31,6 +31,12 @@ const userSchema = new mongoose.Schema(
     totalSolved: { type: Number, default: 0 },
 
     lastActiveAt: { type: Date, default: Date.now },
+
+    // Admin & Moderation
+    isAdmin: { type: Boolean, default: false },
+    isBanned: { type: Boolean, default: false },
+    bannedAt: { type: Date, default: null },
+    banReason: { type: String, default: null },
   },
   { timestamps: true }
 );

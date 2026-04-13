@@ -58,6 +58,7 @@ router.get('/me', authGuard, (req, res) => {
       longestStreak: req.user.longestStreak,
       totalSolved: req.user.totalSolved,
       onboardingComplete: req.user.onboardingComplete,
+      isAdmin: req.user.isAdmin || false,
     },
   });
 });

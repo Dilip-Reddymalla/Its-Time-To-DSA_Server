@@ -14,9 +14,11 @@ const verifyRoutes = require('./routes/verify');
 const statsRoutes = require('./routes/stats');
 const userRoutes = require('./routes/user');
 const problemRoutes = require('./routes/problem');
+const adminRoutes = require('./routes/admin');
 
 const { errorHandler } = require('./middleware/errorHandler');
 const { authGuard } = require('./middleware/authGuard');
+const { adminGuard } = require('./middleware/adminGuard');
 
 const app = express();
 
@@ -57,6 +59,7 @@ app.use('/api/verify', authGuard, verifyRoutes);
 app.use('/api/stats', authGuard, statsRoutes);
 app.use('/api/user', authGuard, userRoutes);
 app.use('/api/problems', authGuard, problemRoutes);
+app.use('/api/admin', authGuard, adminGuard, adminRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
