@@ -1,20 +1,11 @@
 const User = require('../models/User');
 const Progress = require('../models/Progress');
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
-const getTodayIST = () => {
-  const now = new Date();
-  const ist = new Date(now.getTime() + IST_OFFSET_MS);
-  ist.setUTCHours(0, 0, 0, 0);
-  return new Date(ist.getTime() - IST_OFFSET_MS);
-};
-
-const getYesterdayIST = () => {
-  const t = getTodayIST();
-  t.setDate(t.getDate() - 1);
-  return t;
-};
+const { 
+  getEffectiveTodayIST, 
+  getEffectiveYesterdayIST, 
+  IST_OFFSET_MS 
+} = require('../utils/dateUtils');
 
 /**
  * Compute and update streak for a user.
@@ -27,8 +18,8 @@ const getYesterdayIST = () => {
  */
 const updateStreak = async (userId) => {
   const user = await User.findById(userId);
-  const today = getTodayIST();
-  const yesterday = getYesterdayIST();
+  const today = getEffectiveTodayIST();
+  const yesterday = getEffectiveYesterdayIST();
 
   // Count how many problems solved today
   const todayProgress = await Progress.findOne({ userId, date: today });
@@ -69,7 +60,7 @@ const checkAndBreakStreak = async (userId) => {
   const user = await User.findById(userId);
   if (!user || user.currentStreak === 0) return;
 
-  const yesterday = getYesterdayIST();
+  const yesterday = getEffectiveYesterdayIST();
   const yesterdayProgress = await Progress.findOne({ userId, date: yesterday });
   const solvedYesterday = yesterdayProgress?.completed?.length || 0;
 
@@ -113,4 +104,4 @@ const checkAndBreakStreak = async (userId) => {
   return user.currentStreak;
 };
 
-module.exports = { updateStreak, checkAndBreakStreak, getTodayIST };
+module.exports = { updateStreak, checkAndBreakStreak, getEffectiveTodayIST };

@@ -31,6 +31,7 @@ const problemSchema = new mongoose.Schema(
         type: { type: String, enum: ['article', 'video', 'visualization'] },
       },
     ],
+    isPremium: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

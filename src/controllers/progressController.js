@@ -3,17 +3,8 @@ const Problem = require('../models/Problem');
 const Schedule = require('../models/Schedule');
 const User = require('../models/User');
 const { createError } = require('../middleware/errorHandler');
+const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 
-// Must match scheduleController's date logic exactly: YYYY-MM-DDT00:00:00Z
-const getTodayIST = () => {
-  const todayStr = new Intl.DateTimeFormat('en-CA', { 
-    timeZone: 'Asia/Kolkata', 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit' 
-  }).format(new Date());
-  return new Date(todayStr + 'T00:00:00Z');
-};
 
 const getAllProgress = async (req, res, next) => {
   try {
@@ -29,7 +20,7 @@ const getAllProgress = async (req, res, next) => {
 
 const getTodayProgress = async (req, res, next) => {
   try {
-    const today = getTodayIST();
+    const today = getEffectiveTodayIST();
     let progress = await Progress.findOne({ userId: req.user._id, date: today })
       .populate('assigned', 'name difficulty topic slug leetcodeSlug dryRunResources')
       .populate('completed.problemId', 'name')
@@ -37,10 +28,9 @@ const getTodayProgress = async (req, res, next) => {
 
     if (!progress) {
       const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
+      const todayStr = toISTDateString(today);
       const dayEntry = schedule?.days.find((d) => {
-        const d2 = new Date(d.date);
-        d2.setHours(0, 0, 0, 0);
-        return d2.getTime() === today.getTime();
+        return toISTDateString(new Date(d.date)) === todayStr;
       });
 
       if (dayEntry) {
@@ -63,16 +53,16 @@ const getTodayProgress = async (req, res, next) => {
 const markProblem = async (req, res, next) => {
   try {
     const { problemId, solved } = req.body;
-    const today = getTodayIST();
+    const today = getEffectiveTodayIST();
 
     // Find or auto-create today's progress doc (upsert)
     let progress = await Progress.findOne({ userId: req.user._id, date: today });
     if (!progress) {
       // Pull the assigned problem IDs from today's schedule to build the doc
       const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
-      const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' });
+      const todayStr = toISTDateString(today);
       const dayEntry = schedule?.days.find((d) => {
-        return new Date(d.date).toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' }) === todayStr;
+        return toISTDateString(new Date(d.date)) === todayStr;
       });
       const rawAssignedIds = dayEntry?.problems?.map(p => p.problemId) || dayEntry?.problemIds || [];
       const populatedProblems = await Problem.find({ _id: { $in: rawAssignedIds } }).lean();
@@ -124,7 +114,7 @@ const addNote = async (req, res, next) => {
     if (dateParam) {
       targetDate = new Date(dateParam);
     } else {
-      targetDate = getTodayIST();
+      targetDate = getEffectiveTodayIST();
     }
 
     let progress = await Progress.findOne({ userId: req.user._id, date: targetDate });
@@ -148,7 +138,7 @@ const addNote = async (req, res, next) => {
 const toggleBookmark = async (req, res, next) => {
   try {
     const { problemId } = req.body;
-    const today = getTodayIST();
+    const today = getEffectiveTodayIST();
 
     const progress = await Progress.findOne({ userId: req.user._id, date: today });
     if (!progress) return next(createError('No progress entry for today.', 404));

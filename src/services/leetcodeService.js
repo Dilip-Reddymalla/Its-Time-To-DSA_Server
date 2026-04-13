@@ -13,6 +13,37 @@ const RECENT_SUBMISSIONS_QUERY = `
   }
 `;
 
+const PROBLEM_METADATA_QUERY = `
+  query getProblemMetadata($titleSlug: String!) {
+    question(titleSlug: $titleSlug) {
+      isPaidOnly
+    }
+  }
+`;
+
+/**
+ * Check if a LeetCode problem is Premium (Paid Only).
+ */
+const getProblemPremiumStatus = async (titleSlug) => {
+  try {
+    const response = await axios.post(
+      LC_GRAPHQL_URL,
+      {
+        query: PROBLEM_METADATA_QUERY,
+        variables: { titleSlug },
+      },
+      {
+        headers: { 'Content-Type': 'application/json', 'Referer': 'https://leetcode.com' },
+        timeout: 5000,
+      }
+    );
+    return response.data?.data?.question?.isPaidOnly || false;
+  } catch (err) {
+    console.error(`❌ Error checking premium status for ${titleSlug}:`, err.message);
+    return false; // Default to free if check fails
+  }
+};
+
 /**
  * Fetch the last N accepted submissions for a LeetCode username.
  * Returns array of { id, title, titleSlug, timestamp }
@@ -83,4 +114,4 @@ const validateLeetCodeUser = async (username) => {
   }
 };
 
-module.exports = { verifyLeetCodeSubmissions, validateLeetCodeUser };
+module.exports = { verifyLeetCodeSubmissions, validateLeetCodeUser, getProblemPremiumStatus };

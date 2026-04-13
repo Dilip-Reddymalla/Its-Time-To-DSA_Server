@@ -5,24 +5,8 @@ const User = require('../models/User');
 const { verifyLeetCodeSubmissions } = require('../services/leetcodeService');
 const { updateStreak } = require('../services/streakService');
 const { createError } = require('../middleware/errorHandler');
+const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
-const getTargetDate = () => {
-  const now = new Date();
-  const ist = new Date(now.getTime() + IST_OFFSET_MS);
-  ist.setUTCHours(0, 0, 0, 0);
-  const todayIST = new Date(ist.getTime() - IST_OFFSET_MS);
-
-  // Grace period: if it's before 2AM IST, count for yesterday
-  const nowIST = new Date(now.getTime() + IST_OFFSET_MS);
-  if (nowIST.getUTCHours() < 2) {
-    const yesterday = new Date(todayIST);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday;
-  }
-  return todayIST;
-};
 
 const verifySubmissions = async (req, res, next) => {
   try {
@@ -30,18 +14,37 @@ const verifySubmissions = async (req, res, next) => {
       return next(createError('No LeetCode username set. Complete onboarding first.', 400, 'NO_LC_USERNAME'));
     }
 
-    const targetDate = getTargetDate();
-
-    let progress = await Progress.findOne({ userId: req.user._id, date: targetDate });
-    if (!progress) return next(createError('No schedule entry for today.', 404, 'NO_PROGRESS'));
+    const targetDate = getEffectiveTodayIST();
+    const todayStr = toISTDateString(targetDate);
 
     const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
     const dayEntry = schedule?.days.find((d) => {
-      const d2 = new Date(d.date);
-      d2.setHours(0, 0, 0, 0);
-      return d2.getTime() === targetDate.getTime();
+      return toISTDateString(new Date(d.date)) === todayStr;
     });
-    if (!dayEntry) return next(createError('Schedule day not found.', 404));
+
+    if (!dayEntry) {
+      return next(createError('No active mission scheduled for today.', 404, 'NO_SCHEDULE_TODAY'));
+    }
+
+    let progress = await Progress.findOne({ userId: req.user._id, date: targetDate });
+
+    if (!progress) {
+      const assignedIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
+      const problemsFound = await Problem.find({ _id: { $in: assignedIds } }).lean();
+      
+      const validAssignedIds = problemsFound
+        .filter(p => (p.leetcodeSlug && p.leetcodeSlug !== 'null') || (p.gfgUrl && p.gfgUrl !== 'null'))
+        .map(p => p._id);
+
+      progress = await Progress.create({
+        userId: req.user._id,
+        date: targetDate,
+        dayNumber: dayEntry.dayNumber,
+        assigned: validAssignedIds,
+        completed: []
+      });
+    }
+
 
     // Use the new nested problems structure from the updated Schedule schema
     const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);

@@ -89,6 +89,7 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
   const excludeIds = (excludeProblemIds || []).map(id => id.toString());
   
   const start = new Date(startDate);
+  // Ensure we start at midnight UTC (which represents 05:30 IST of the chosen day)
   start.setUTCHours(0, 0, 0, 0);
 
   const phases = calculatePhases(totalDays);
@@ -167,7 +168,7 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
 
   for (let dayNum = 1; dayNum <= totalDays; dayNum++) {
     const date = new Date(start);
-    date.setDate(start.getDate() + dayNum - 1);
+    date.setUTCDate(start.getUTCDate() + dayNum - 1);
     
     // NEW: Check if the day is Saturday (0 is Sunday, 6 is Saturday)
     const isSaturday = date.getUTCDay() === 6;
