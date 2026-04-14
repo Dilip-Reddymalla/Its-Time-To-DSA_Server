@@ -1,5 +1,6 @@
 const Problem = require('../models/Problem');
 const Progress = require('../models/Progress');
+const Report = require('../models/Report');
 const axios = require('axios');
 const { createError } = require('../middleware/errorHandler');
 
@@ -122,8 +123,18 @@ const validateLeetcodeSlug = async (req, res, next) => {
   }
 };
 
+const reportProblem = async (req, res, next) => {
+  try {
+    const { reason, description } = req.body;
+    const report = new Report({ userId: req.user._id, problemId: req.params.id, reason, description });
+    await report.save();
+    res.json({ success: true, message: 'Report submitted. Thank you!' });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   getProblems,
   getFilterData,
   validateLeetcodeSlug,
+  reportProblem,
 };

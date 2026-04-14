@@ -21,8 +21,11 @@ const getStats = async (req, res, next) => {
       }
     });
 
+    // Real Total Solved (deduplicated)
+    const completedIds = allProgress.flatMap((p) => p.completed.map((c) => c.problemId.toString()));
+    const realTotalSolved = new Set(completedIds).size;
+
     // Topic breakdown
-    const completedIds = allProgress.flatMap((p) => p.completed.map((c) => c.problemId));
     const completedProblems = await Problem.find({ _id: { $in: completedIds } }).lean();
 
     const topicMap = {};
@@ -48,7 +51,7 @@ const getStats = async (req, res, next) => {
         currentStreak: user.currentStreak,
         longestStreak: user.longestStreak,
         restTokens: user.restTokens,
-        totalSolved: user.totalSolved,
+        totalSolved: realTotalSolved,
         daysActive,
         topicBreakdown: topicMap,
         difficultyDistribution: difficulties,

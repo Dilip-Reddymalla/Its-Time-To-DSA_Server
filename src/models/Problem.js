@@ -23,7 +23,6 @@ const problemSchema = new mongoose.Schema(
     },
     tags: [{ type: String, trim: true }],
     companies: [{ type: String, trim: true }],
-    // Dry-run resources (GFG, YouTube, articles)
     dryRunResources: [
       {
         label: String,
@@ -32,6 +31,7 @@ const problemSchema = new mongoose.Schema(
       },
     ],
     isPremium: { type: Boolean, default: false },
+    isOptional: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

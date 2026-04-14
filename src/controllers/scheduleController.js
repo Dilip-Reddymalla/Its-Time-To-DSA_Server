@@ -1,6 +1,7 @@
 const Schedule = require('../models/Schedule');
 const Progress = require('../models/Progress');
 const Problem = require('../models/Problem');
+const Report = require('../models/Report');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 
@@ -80,9 +81,18 @@ const getToday = async (req, res, next) => {
       }
     }
 
+    let carryoverCount = 0;
     if (carryoverProblemIds.length > 0) {
       const carryoverProblems = await Problem.find({ _id: { $in: carryoverProblemIds } }).lean();
       carryoverProblems.forEach((p) => {
+        const isOpt = p.isOptional || !!(p.leetcodeSlug && p.isPremium);
+        const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+        const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
+        const isValid = !!(validLc || validGfg);
+        
+        if (isOpt || !isValid) return;
+
+        carryoverCount++;
         enrichedProblems.push({
           ...p,
           isRevision: false,
@@ -104,7 +114,7 @@ const getToday = async (req, res, next) => {
     };
     const coreProblems = enrichedProblems.filter(isValidProblem).map(p => ({
       ...p,
-      isOptional: !!(p.leetcodeSlug && p.isPremium)
+      isOptional: p.isOptional || !!(p.leetcodeSlug && p.isPremium)
     }));
     const searchPractice = enrichedProblems.filter(p => !isValidProblem(p));
 
@@ -120,7 +130,7 @@ const getToday = async (req, res, next) => {
         type: dayEntry.type,
         problems: coreProblems,
         searchPractice: searchPractice,
-        carryoverCount: carryoverProblemIds.length,
+        carryoverCount: carryoverCount,
         concepts: dayEntry.readings ? dayEntry.readings.map(r => r.title) : (dayEntry.concepts || []),
         readings: dayEntry.readings || [],
         isCompleted: dayEntry.isCompleted || false,
@@ -237,4 +247,117 @@ const getFullSchedule = async (req, res, next) => {
   }
 };
 
-module.exports = { getToday, getDayByNumber, getOverview, getFullSchedule };
+const replaceProblem = async (req, res, next) => {
+  try {
+    const { problemId } = req.body;
+    const schedule = await Schedule.findOne({ userId: req.user._id });
+    if (!schedule) return next(createError('Schedule not found', 404));
+
+    let foundDay = null;
+    let foundIndex = -1;
+
+    for (const day of schedule.days) {
+      if (day.problems) {
+        const idx = day.problems.findIndex(p => p.problemId.toString() === problemId);
+        if (idx !== -1) { foundDay = day; foundIndex = idx; break; }
+      } else if (day.problemIds) {
+        const pIdx = day.problemIds.findIndex(id => id.toString() === problemId);
+        if (pIdx !== -1) { foundDay = day; foundIndex = pIdx; break; }
+      }
+    }
+
+    if (!foundDay) return next(createError('Problem not assigned in schedule', 400));
+
+    const allAssignedIds = new Set();
+    schedule.days.forEach(day => {
+      if (day.problems) day.problems.forEach(p => allAssignedIds.add(p.problemId.toString()));
+      if (day.problemIds) day.problemIds.forEach(id => allAssignedIds.add(id.toString()));
+    });
+
+    const oldProblem = await Problem.findById(problemId);
+    if (!oldProblem) return next(createError('Problem not found', 404));
+
+    const getCandidates = async (query, diffs, allowedTopics) => {
+      let cands = await Problem.find({ ...query, difficulty: { $in: diffs } }).lean();
+      if (allowedTopics) {
+        cands = cands.filter(p => allowedTopics.includes(p.topic));
+      }
+      return cands.filter(p => {
+         const validLc = (p.leetcodeSlug && p.leetcodeSlug !== 'null');
+         const validGfg = ((p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null'));
+         const isLcPremiumOpt = !!(p.leetcodeSlug && p.isPremium);
+         return (validLc || validGfg) && !isLcPremiumOpt;
+      });
+    };
+
+    let allowedDiffs = ['Easy', 'Medium'];
+    if (oldProblem.difficulty === 'Hard') allowedDiffs = ['Hard', 'Medium'];
+
+    let baseQuery = { _id: { $nin: [...allAssignedIds] }, isOptional: { $ne: true } };
+    let candidates = await getCandidates(baseQuery, allowedDiffs, [oldProblem.topic]);
+
+    if (candidates.length === 0) {
+      candidates = await getCandidates(baseQuery, allowedDiffs, null);
+    }
+
+    if (candidates.length === 0) {
+      // Fallback: The entire DB is already in the schedule!
+      // Pick a problem that is simply NOT assigned TODAY.
+      const todayAssignedIds = new Set();
+      if (foundDay.problems) foundDay.problems.forEach(p => todayAssignedIds.add(p.problemId.toString()));
+      if (foundDay.problemIds) foundDay.problemIds.forEach(id => todayAssignedIds.add(id.toString()));
+      
+      const fallbackQuery = { _id: { $nin: [...todayAssignedIds] }, isOptional: { $ne: true } };
+      candidates = await getCandidates(fallbackQuery, allowedDiffs, [oldProblem.topic]);
+
+      if (candidates.length === 0) {
+        candidates = await getCandidates(fallbackQuery, allowedDiffs, null);
+      }
+    }
+
+    if (candidates.length === 0) {
+      return next(createError('No replacement problems available in the database.', 404));
+    }
+
+    const replacement = candidates[Math.floor(Math.random() * candidates.length)];
+
+    if (foundDay.problems) {
+      foundDay.problems[foundIndex].problemId = replacement._id;
+    } else if (foundDay.problemIds) {
+      foundDay.problemIds[foundIndex] = replacement._id;
+    }
+
+    schedule.markModified('days');
+    await schedule.save();
+    
+    // Attempt to update progress if assigned today
+    const currentDayStart = getEffectiveTodayIST();
+    const progress = await Progress.findOne({ userId: req.user._id, date: currentDayStart });
+    if (progress) {
+      let isChanged = false;
+      const pIndex = progress.assigned.findIndex(id => id.toString() === problemId);
+      if (pIndex !== -1) {
+         progress.assigned[pIndex] = replacement._id;
+         isChanged = true;
+      }
+      
+      const cIndex = progress.completed.findIndex(c => c.problemId.toString() === problemId);
+      if (cIndex !== -1) {
+          progress.completed = progress.completed.filter(c => c.problemId.toString() !== problemId);
+          isChanged = true;
+      }
+
+      const bIndex = progress.bookmarked.findIndex(id => id.toString() === problemId);
+      if (bIndex !== -1) {
+         progress.bookmarked = progress.bookmarked.filter(id => id.toString() !== problemId);
+         isChanged = true;
+      }
+
+      if (isChanged) await progress.save();
+    }
+
+    res.json({ success: true, message: 'Problem replaced successfully.', data: replacement });
+  } catch(err) { next(err); }
+}
+
+module.exports = { getToday, getDayByNumber, getOverview, getFullSchedule, replaceProblem };

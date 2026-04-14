@@ -48,7 +48,7 @@ const SEED_PROBLEMS = [
   { name: 'Palindrome Number', slug: 'palindrome-number', difficulty: 'Easy', topic: 'Basic Math', leetcodeSlug: 'palindrome-number', source: 'striver-a2z', resourceUrl: 'https://www.youtube.com/watch?v=1xNbjMdbjug' },
   { name: 'Reverse Integer', slug: 'reverse-integer', difficulty: 'Medium', topic: 'Basic Math', leetcodeSlug: 'reverse-integer', source: 'striver-a2z' },
   { name: 'GCD of Two Numbers', slug: 'gcd-of-two-numbers', difficulty: 'Easy', topic: 'Basic Math', leetcodeSlug: 'find-greatest-common-divisor-of-array', source: 'striver-a2z', dryRunResources: [{ label: 'Euclid GCD - GFG', url: 'https://www.geeksforgeeks.org/euclidean-algorithms-basic-and-extended/', type: 'article' }] },
-  { name: 'Count Digits', slug: 'count-digits', difficulty: 'Easy', topic: 'Basic Math', leetcodeSlug: 'count-digits', source: 'striver-a2z' },
+  { name: 'Count Digits', slug: 'count-digits', difficulty: 'Easy', topic: 'Basic Math', leetcodeSlug: 'count-digits', source: 'striver-a2z', isOptional: true },
   { name: 'Armstrong Numbers', slug: 'armstrong-numbers', difficulty: 'Easy', topic: 'Basic Math', leetcodeSlug: 'armstrong-number', source: 'striver-a2z' },
 
   // Hashing

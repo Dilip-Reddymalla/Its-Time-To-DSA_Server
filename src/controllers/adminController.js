@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Progress = require('../models/Progress');
 const Schedule = require('../models/Schedule');
 const Problem = require('../models/Problem');
+const Report = require('../models/Report');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 
@@ -260,10 +261,22 @@ const getAllUsers = async (req, res, next) => {
 
     const total = await User.countDocuments(query);
 
+    const userIds = users.map((u) => u._id);
+
+    // Get ALL progress docs for these users to calculate realTotalSolved
+    const allProgressDocs = await Progress.find({ userId: { $in: userIds }, 'completed.0': { $exists: true } }).select('userId completed').lean();
+    
+    // Calculate realTotalSolved
+    const realSolvedMap = {};
+    allProgressDocs.forEach((p) => {
+      const uid = p.userId.toString();
+      if (!realSolvedMap[uid]) realSolvedMap[uid] = new Set();
+      p.completed.forEach((c) => realSolvedMap[uid].add(c.problemId.toString()));
+    });
+
     // Compute accurate today progress using schedule + progress + problem filtering
     const today = getEffectiveTodayIST();
     const todayStr = toISTDateString(today);
-    const userIds = users.map((u) => u._id);
 
     const todayProgressDocs = await Progress.find({ userId: { $in: userIds }, date: today }).lean();
     const progressMap = {};
@@ -289,6 +302,7 @@ const getAllUsers = async (req, res, next) => {
       const counts = accurateCounts[uid];
       return {
         ...u,
+        realTotalSolved: realSolvedMap[uid]?.size || 0,
         todayProgress: counts ? {
           assignedToday: counts.coreAssigned,
           completedToday: counts.coreCompleted,
@@ -779,6 +793,54 @@ const adminMarkProblem = async (req, res, next) => {
   }
 };
 
+const getReports = async (req, res, next) => {
+  try {
+    const { status = 'pending', page = 1, limit = 50 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const query = { status };
+    const reports = await Report.find(query)
+      .populate('userId', 'username email')
+      .populate('problemId', 'name difficulty topic leetcodeSlug isOptional')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .lean();
+      
+    const total = await Report.countDocuments(query);
+    
+    res.json({ success: true, data: reports, pagination: { total, page: parseInt(page), pages: Math.ceil(total / limit) } });
+  } catch (e) { next(e); }
+};
+
+const resolveReport = async (req, res, next) => {
+  try {
+    const report = await Report.findById(req.params.id);
+    if (!report) return next(createError('Report not found', 404));
+    
+    report.status = 'resolved';
+    report.resolvedBy = req.user._id;
+    report.resolvedAt = new Date();
+    await report.save();
+    
+    res.json({ success: true, message: 'Report marked resolved' });
+  } catch(e) { next(e); }
+};
+
+const updateProblemAdmin = async (req, res, next) => {
+  try {
+    const { name, leetcodeSlug, difficulty, topic, isOptional } = req.body;
+    const problem = await Problem.findByIdAndUpdate(
+       req.params.id, 
+       { name, leetcodeSlug, difficulty, topic, isOptional }, 
+       { new: true }
+    );
+    if (!problem) return next(createError('Problem not found', 404));
+    
+    res.json({ success: true, message: 'Problem updated successfully', data: problem });
+  } catch(e) { next(e); }
+};
+
 module.exports = {
   getDashboardOverview,
   getAllUsers,
@@ -789,4 +851,7 @@ module.exports = {
   getUserActivityLog,
   toggleBanUser,
   adminMarkProblem,
+  getReports,
+  resolveReport,
+  updateProblemAdmin,
 };
