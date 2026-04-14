@@ -338,6 +338,9 @@ const getUserDetail = async (req, res, next) => {
       .select('generatedAt totalDays dailyGoal')
       .lean();
 
+    // Stats (heatmap + topic breakdown) — use UNIQUE problem IDs across all days
+    const allProgress = await Progress.find({ userId: id }).lean();
+
     // Today's assignment — use accurate counting
     const today = getEffectiveTodayIST();
     const todayStr = toISTDateString(today);
@@ -351,19 +354,63 @@ const getUserDetail = async (req, res, next) => {
         const todayProgress = await Progress.findOne({ userId: id, date: today }).lean();
         const counts = await computeDayCounts(dayEntry, todayProgress);
 
+        // --- CARRY-OVER Logic ---
+        const globalCompletedBeforeToday = new Set();
+        allProgress.forEach((p) => {
+          const pDateStr = toISTDateString(new Date(p.date));
+          if (pDateStr < todayStr) {
+            (p.completed || []).forEach(c => globalCompletedBeforeToday.add(c.problemId.toString()));
+          }
+        });
+
+        const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
+        const alreadyIncludedIds = new Set(problemIds.map(id => id.toString()));
+        const carryoverProblemIds = [];
+
+        for (const pastDay of fullSchedule.days || []) {
+          const pastDayStr = toISTDateString(new Date(pastDay.date));
+          if (pastDayStr >= todayStr) continue;
+
+          const pastAssignedIds = pastDay.problems
+            ? pastDay.problems.map(p => p.problemId.toString())
+            : (pastDay.problemIds || []).map(id => id.toString());
+
+          for (const pid of pastAssignedIds) {
+            if (!globalCompletedBeforeToday.has(pid) && !alreadyIncludedIds.has(pid)) {
+              if (isValidProblem({ leetcodeSlug: 'mock', gfgUrl: 'mock' })) { // We use actual Problem filtering later
+                 carryoverProblemIds.push(pid);
+                 alreadyIncludedIds.add(pid);
+              }
+            }
+          }
+        }
+
+        let carryoverProblems = [];
+        if (carryoverProblemIds.length > 0) {
+           const dbCarryProbs = await Problem.find({ _id: { $in: carryoverProblemIds } }).lean();
+           carryoverProblems = dbCarryProbs.filter(isValidProblem).map((p) => {
+             const isOptional = p.isOptional || !!(p.leetcodeSlug && p.isPremium);
+             const SolvedIds = new Set((todayProgress?.completed || []).map(c => c.problemId.toString()));
+             return {
+                 ...p,
+                 solved: SolvedIds.has(p._id.toString()),
+                 isOptional,
+                 isCarryover: true
+             };
+           }).filter(p => !p.isOptional);
+        }
+
         todayAssignment = {
           dayNumber: dayEntry.dayNumber,
           type: dayEntry.type,
-          problems: counts.problems,
-          totalAssigned: counts.coreAssigned,
-          totalCompleted: counts.coreCompleted,
-          allDone: counts.allDone,
+          problems: [...counts.problems, ...carryoverProblems],
+          totalAssigned: counts.coreAssigned + carryoverProblems.length,
+          totalCompleted: counts.coreCompleted + carryoverProblems.filter(p => p.solved).length,
+          allDone: (counts.coreCompleted + carryoverProblems.filter(p => p.solved).length) >= (counts.coreAssigned + carryoverProblems.length) && (counts.coreAssigned + carryoverProblems.length) > 0,
         };
       }
     }
 
-    // Stats (heatmap + topic breakdown) — use UNIQUE problem IDs across all days
-    const allProgress = await Progress.find({ userId: id }).lean();
     const heatmap = {};
     const istFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' });
 

@@ -48,7 +48,38 @@ const verifySubmissions = async (req, res, next) => {
 
     // Use the new nested problems structure from the updated Schedule schema
     const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
-    const problems = await Problem.find({ _id: { $in: problemIds } }).lean();
+
+    // --- CARRY-OVER Logic: find previously assigned problems that haven't been completed ---
+    const allProgressDocs = await Progress.find({ userId: req.user._id }).lean();
+    const globalCompletedBeforeToday = new Set();
+    allProgressDocs.forEach((p) => {
+      const pDateStr = toISTDateString(new Date(p.date));
+      if (pDateStr < todayStr) {
+        (p.completed || []).forEach(c => globalCompletedBeforeToday.add(c.problemId.toString()));
+      }
+    });
+
+    const alreadyIncludedIds = new Set(problemIds.map(id => id.toString()));
+    const carryoverProblemIds = [];
+
+    for (const pastDay of schedule.days || []) {
+      const pastDayStr = toISTDateString(new Date(pastDay.date));
+      if (pastDayStr >= todayStr) continue;
+
+      const pastAssignedIds = pastDay.problems
+        ? pastDay.problems.map(p => p.problemId.toString())
+        : (pastDay.problemIds || []).map(id => id.toString());
+
+      for (const pid of pastAssignedIds) {
+        if (!globalCompletedBeforeToday.has(pid) && !alreadyIncludedIds.has(pid)) {
+          carryoverProblemIds.push(pid);
+          alreadyIncludedIds.add(pid);
+        }
+      }
+    }
+
+    const allProblemIdsToVerify = [...problemIds, ...carryoverProblemIds];
+    const problems = await Problem.find({ _id: { $in: allProblemIdsToVerify } }).lean();
     const submissions = await verifyLeetCodeSubmissions(req.user.leetcodeUsername);
     const acceptedSlugs = new Set(submissions.map((s) => s.titleSlug));
 
