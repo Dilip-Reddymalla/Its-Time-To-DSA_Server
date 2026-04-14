@@ -4,6 +4,7 @@ const Progress = require('../models/Progress');
 const { 
   getEffectiveTodayIST, 
   getEffectiveYesterdayIST, 
+  toISTDateString,
   IST_OFFSET_MS 
 } = require('../utils/dateUtils');
 
@@ -22,9 +23,10 @@ const updateStreak = async (userId) => {
 
   const today = getEffectiveTodayIST();
   const yesterday = getEffectiveYesterdayIST();
+  const todayStr = toISTDateString(today);
 
   // 1. Idempotency Check: Already updated today?
-  if (user.lastStreakUpdate && new Date(user.lastStreakUpdate).getTime() === today.getTime()) {
+  if (user.lastStreakUpdate && toISTDateString(user.lastStreakUpdate) === todayStr) {
     return { currentStreak: user.currentStreak, longestStreak: user.longestStreak };
   }
 

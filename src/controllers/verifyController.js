@@ -83,21 +83,26 @@ const verifySubmissions = async (req, res, next) => {
     const submissions = await verifyLeetCodeSubmissions(req.user.leetcodeUsername);
     const acceptedSlugs = new Set(submissions.map((s) => s.titleSlug));
 
+    let newlySolvedCount = 0;
     const updated = [];
     for (const problem of problems) {
       if (!problem.leetcodeSlug) continue;
       const solved = acceptedSlugs.has(problem.leetcodeSlug);
+      
       if (solved) {
-        const alreadyVerified = progress.completed.find(
-          (c) => c.problemId.toString() === problem._id.toString() && c.verifiedViaLC
+        const existingCompletion = progress.completed.find(
+          (c) => c.problemId.toString() === problem._id.toString()
         );
-        if (!alreadyVerified) {
-          const existing = progress.completed.find((c) => c.problemId.toString() === problem._id.toString());
-          if (existing) {
-            existing.verifiedViaLC = true;
-          } else {
-            progress.completed.push({ problemId: problem._id, solvedAt: new Date(), verifiedViaLC: true });
-          }
+
+        if (!existingCompletion) {
+          // Brand new solve found via verification
+          progress.completed.push({ problemId: problem._id, solvedAt: new Date(), verifiedViaLC: true });
+          newlySolvedCount++;
+        } else if (!existingCompletion.verifiedViaLC) {
+          // Was manually marked before, now verified via LC
+          existingCompletion.verifiedViaLC = true;
+          // We don't increment newlySolvedCount here because totalSolved was already 
+          // incremented when the problem was manually marked.
         }
       }
       updated.push({ slug: problem.leetcodeSlug, solved });
@@ -109,9 +114,8 @@ const verifySubmissions = async (req, res, next) => {
     await progress.save();
 
     const streakData = await updateStreak(req.user._id);
-    const newlySolved = updated.filter((u) => u.solved).length;
-    if (newlySolved > 0) {
-      await User.findByIdAndUpdate(req.user._id, { $inc: { totalSolved: newlySolved } });
+    if (newlySolvedCount > 0) {
+      await User.findByIdAndUpdate(req.user._id, { $inc: { totalSolved: newlySolvedCount } });
     }
 
     res.json({
