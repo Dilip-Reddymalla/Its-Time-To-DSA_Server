@@ -13,6 +13,8 @@ const {
   getReports,
   resolveReport,
   updateProblemAdmin,
+  getUserFullSchedule,
+  adminReplaceProblem,
 } = require('../controllers/adminController');
 
 // ─── Read-Only Endpoints ─────────────────────────────────────────────────────
@@ -20,6 +22,7 @@ router.get('/reports', getReports);
 router.get('/overview', getDashboardOverview);
 router.get('/users', getAllUsers);
 router.get('/users/:id', getUserDetail);
+router.get('/users/:id/schedule', getUserFullSchedule);
 router.get('/users/:id/activity', getUserActivityLog);
 router.get('/today', getTodaySnapshot);
 router.get('/stats', getPlatformStats);
@@ -28,6 +31,7 @@ router.get('/leaderboard', getLeaderboard);
 // ─── Write Endpoints ─────────────────────────────────────────────────────────
 router.post('/users/:id/ban', toggleBanUser);
 router.post('/mark-problem', adminMarkProblem);
+router.post('/users/:id/replace-problem', adminReplaceProblem);
 router.put('/reports/:id/resolve', resolveReport);
 router.put('/problems/:id', updateProblemAdmin);
 

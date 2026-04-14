@@ -2,7 +2,7 @@ const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 
 /**
  * Returns a Date object representing the start of the "effective" IST day (00:00:00Z).
- * This accounts for a grace period (e.g., before 2 AM IST counts as the previous day).
+ * This accounts for a grace period (e.g., before 1 AM IST counts as the previous day).
  */
 const getEffectiveTodayIST = () => {
   const now = new Date();

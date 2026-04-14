@@ -18,34 +18,45 @@ const {
  */
 const updateStreak = async (userId) => {
   const user = await User.findById(userId);
+  if (!user) return { currentStreak: 0, longestStreak: 0 };
+
   const today = getEffectiveTodayIST();
   const yesterday = getEffectiveYesterdayIST();
 
-  // Count how many problems solved today
+  // 1. Idempotency Check: Already updated today?
+  if (user.lastStreakUpdate && new Date(user.lastStreakUpdate).getTime() === today.getTime()) {
+    return { currentStreak: user.currentStreak, longestStreak: user.longestStreak };
+  }
+
+  // 2. Count solved problems today
   const todayProgress = await Progress.findOne({ userId, date: today });
   const solvedToday = todayProgress?.completed?.length || 0;
 
-  // Check yesterday's progress (for streak continuity)
-  const yesterdayProgress = await Progress.findOne({ userId, date: yesterday });
-  const solvedYesterday = yesterdayProgress?.completed?.length || 0;
-
-  let { currentStreak, longestStreak } = user;
-
-  if (solvedToday > 0) {
-    // If yesterday was solved (or this is day 1), increment streak
-    if (solvedYesterday > 0 || currentStreak === 0) {
-      currentStreak += 1;
-    } else {
-      // Gap in streak — reset to 1
-      currentStreak = 1;
-    }
-    longestStreak = Math.max(longestStreak, currentStreak);
+  if (solvedToday === 0) {
+    // We don't increment, but we also don't break it here (handled by checkAndBreakStreak or next solved day)
+    return { currentStreak: user.currentStreak, longestStreak: user.longestStreak };
   }
-  // Note: streak breaking (setting to 0) is handled by a nightly cron job / checked on dashboard load
+
+  // 3. Increment streak
+  let { currentStreak, longestStreak } = user;
+  
+  // Check if yesterday was solved or if it was a rest day
+  const yesterdayProgress = await Progress.findOne({ userId, date: yesterday });
+  const solvedYesterday = (yesterdayProgress?.completed?.length || 0) > 0 || yesterdayProgress?.isRestDay === true;
+
+  if (solvedYesterday || currentStreak === 0) {
+    currentStreak += 1;
+  } else {
+    // Gap in streak (and not protected by rest day) — reset to 1
+    currentStreak = 1;
+  }
+
+  longestStreak = Math.max(longestStreak, currentStreak);
 
   await User.findByIdAndUpdate(userId, {
     currentStreak,
     longestStreak,
+    lastStreakUpdate: today,
     lastActiveAt: new Date(),
   });
 

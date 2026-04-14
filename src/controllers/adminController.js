@@ -5,6 +5,7 @@ const Problem = require('../models/Problem');
 const Report = require('../models/Report');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
+const { updateStreak } = require('../services/streakService');
 
 /**
  * Shared helper: determine if a problem is a "core" trackable problem
@@ -26,12 +27,14 @@ const computeDayCounts = async (dayEntry, progressDoc) => {
 
   const problemIds = dayEntry.problems ? dayEntry.problems.map((p) => p.problemId) : [];
   const problems = await Problem.find({ _id: { $in: problemIds } })
-    .select('name difficulty topic leetcodeSlug slug gfgUrl isPremium')
+    .select('name difficulty topic leetcodeSlug slug gfgUrl isPremium isOptional')
     .lean();
 
   // Filter to core problems (with valid links) — same as scheduleController
-  const coreProblems = problems.filter(isValidProblem);
-  const mandatoryProblems = coreProblems.filter(p => !(p.leetcodeSlug && p.isPremium));
+  const coreProblems = problems.filter(p => {
+    return isValidProblem(p) && !p.isOptional && !p.isPremium;
+  });
+  const mandatoryProblems = coreProblems;
 
   const completedIds = new Set(
     (progressDoc?.completed || []).map((c) => c.problemId.toString())
@@ -47,7 +50,7 @@ const computeDayCounts = async (dayEntry, progressDoc) => {
     problems: coreProblems.map((p) => ({
       ...p,
       solved: completedIds.has(p._id.toString()),
-      isOptional: !!(p.leetcodeSlug && p.isPremium),
+      isOptional: !!(p.isOptional || p.isPremium),
     })),
   };
 };
@@ -68,7 +71,7 @@ const batchComputeDayCounts = async (scheduleMap, progressMap) => {
 
   // Single batch fetch of all problems
   const allProblems = await Problem.find({ _id: { $in: [...allProblemIds] } })
-    .select('name difficulty topic leetcodeSlug slug gfgUrl isPremium')
+    .select('name difficulty topic leetcodeSlug slug gfgUrl isPremium isOptional')
     .lean();
   const problemMap = {};
   allProblems.forEach((p) => { problemMap[p._id.toString()] = p; });
@@ -83,8 +86,10 @@ const batchComputeDayCounts = async (scheduleMap, progressMap) => {
     }
 
     const problems = entry.problemIds.map((id) => problemMap[id.toString()]).filter(Boolean);
-    const coreProblems = problems.filter(isValidProblem);
-    const mandatoryProblems = coreProblems.filter(p => !(p.leetcodeSlug && p.isPremium));
+    const coreProblems = problems.filter(p => {
+      return isValidProblem(p) && !p.isOptional && !p.isPremium;
+    });
+    const mandatoryProblems = coreProblems;
 
     const progress = progressMap[uid];
     const completedIds = new Set(
@@ -134,11 +139,25 @@ const getDashboardOverview = async (req, res, next) => {
       .select('userId completed')
       .lean();
     
-    const uniqueSolvedIds = new Set();
+    const rawUniqueSolvedIds = new Set();
     allProgress.forEach((p) => {
-      p.completed.forEach((c) => uniqueSolvedIds.add(c.problemId.toString()));
+      p.completed.forEach((c) => rawUniqueSolvedIds.add(c.problemId.toString()));
     });
-    const totalSolvedPlatform = uniqueSolvedIds.size;
+    
+    // Filter out optional/premium problems
+    const coreProblemsAtPlatform = await Problem.find({ 
+      _id: { $in: [...rawUniqueSolvedIds] },
+      isOptional: { $ne: true },
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    }).select('_id').lean();
+    const coreProblemIdsSet = new Set(coreProblemsAtPlatform.map(p => p._id.toString()));
+
+    const totalSolvedPlatform = coreProblemIdsSet.size;
 
     // Average solved per user
     const perUserSolved = {};
@@ -146,7 +165,12 @@ const getDashboardOverview = async (req, res, next) => {
       const uid = p.userId?.toString();
       if (uid) {
         if (!perUserSolved[uid]) perUserSolved[uid] = new Set();
-        p.completed.forEach((c) => perUserSolved[uid].add(c.problemId.toString()));
+        p.completed.forEach((c) => {
+          const pid = c.problemId.toString();
+          if (coreProblemIdsSet.has(pid)) {
+            perUserSolved[uid].add(pid);
+          }
+        });
       }
     });
     const userSolveCounts = Object.values(perUserSolved).map((s) => s.size);
@@ -267,11 +291,34 @@ const getAllUsers = async (req, res, next) => {
     const allProgressDocs = await Progress.find({ userId: { $in: userIds }, 'completed.0': { $exists: true } }).select('userId completed').lean();
     
     // Calculate realTotalSolved
-    const realSolvedMap = {};
+    const rawSolvedMap = {};
+    const allKnownSolvedIds = new Set();
     allProgressDocs.forEach((p) => {
       const uid = p.userId.toString();
-      if (!realSolvedMap[uid]) realSolvedMap[uid] = new Set();
-      p.completed.forEach((c) => realSolvedMap[uid].add(c.problemId.toString()));
+      if (!rawSolvedMap[uid]) rawSolvedMap[uid] = new Set();
+      p.completed.forEach((c) => {
+        const pid = c.problemId.toString();
+        rawSolvedMap[uid].add(pid);
+        allKnownSolvedIds.add(pid);
+      });
+    });
+
+    // Filter for core problems
+    const coreProblemsAtList = await Problem.find({ 
+      _id: { $in: [...allKnownSolvedIds] },
+      isOptional: { $ne: true },
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    }).select('_id').lean();
+    const coreIdsSet = new Set(coreProblemsAtList.map(p => p._id.toString()));
+
+    const realSolvedMap = {};
+    Object.keys(rawSolvedMap).forEach(uid => {
+      realSolvedMap[uid] = new Set([...rawSolvedMap[uid]].filter(pid => coreIdsSet.has(pid)));
     });
 
     // Compute accurate today progress using schedule + progress + problem filtering
@@ -424,7 +471,18 @@ const getUserDetail = async (req, res, next) => {
     allProgress.forEach((p) => {
       p.completed.forEach((c) => uniqueCompletedIds.add(c.problemId.toString()));
     });
-    const completedProblems = await Problem.find({ _id: { $in: [...uniqueCompletedIds] } }).lean();
+    
+    // Fetch and filter for core problems
+    const completedProblems = await Problem.find({ 
+      _id: { $in: [...uniqueCompletedIds] },
+      isOptional: { $ne: true },
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    }).lean();
 
     const topicMap = {};
     completedProblems.forEach((p) => {
@@ -440,7 +498,7 @@ const getUserDetail = async (req, res, next) => {
     });
 
     const daysActive = allProgress.filter((p) => p.completed.length > 0).length;
-    const realTotalSolved = uniqueCompletedIds.size;
+    const realTotalSolved = completedProblems.length;
 
     // Recent activity (last 15 progress entries)
     const recentActivity = allProgress
@@ -569,16 +627,52 @@ const getPlatformStats = async (req, res, next) => {
   try {
     // Problems solved per day (last 30 days)
     const today = getEffectiveTodayIST();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setUTCDate(thirtyDaysAgo.getUTCDate() - 30);
+
+    const progressInLastMonth = await Progress.find({ 
+      date: { $gte: thirtyDaysAgo, $lte: today } 
+    }).lean();
+
+    // Collect all problem IDs solved in the last month to filter them
+    const monthlyProblemIds = new Set();
+    progressInLastMonth.forEach(p => {
+      (p.completed || []).forEach(c => monthlyProblemIds.add(c.problemId.toString()));
+    });
+
+    const coreMonthlyProblems = await Problem.find({
+      _id: { $in: [...monthlyProblemIds] },
+      isOptional: { $ne: true },
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    }).select('_id').lean();
+    const coreMonthlyIdsSet = new Set(coreMonthlyProblems.map(p => p._id.toString()));
+
     const solvedPerDay = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today);
       d.setUTCDate(d.getUTCDate() - i);
-      const progressDocs = await Progress.find({ date: d }).lean();
-      const totalSolved = progressDocs.reduce((sum, p) => sum + (p.completed?.length || 0), 0);
-      const activeUsers = progressDocs.filter((p) => p.completed?.length > 0).length;
+      const dStrLabel = toISTDateString(d);
+      const docsForDay = progressInLastMonth.filter(p => toISTDateString(new Date(p.date)) === dStrLabel);
+      
+      let dailyCoreSolved = 0;
+      docsForDay.forEach(p => {
+        (p.completed || []).forEach(c => {
+          if (coreMonthlyIdsSet.has(c.problemId.toString())) {
+            dailyCoreSolved++;
+          }
+        });
+      });
+
+      const activeUsers = docsForDay.filter((p) => (p.completed || []).some(c => coreMonthlyIdsSet.has(c.problemId.toString()))).length;
+
       solvedPerDay.push({
-        date: d.toISOString().split('T')[0],
-        solved: totalSolved,
+        date: dStrLabel,
+        solved: dailyCoreSolved,
         activeUsers,
       });
     }
@@ -587,11 +681,21 @@ const getPlatformStats = async (req, res, next) => {
     const allProgress = await Progress.find({ 'completed.0': { $exists: true } })
       .select('completed')
       .lean();
-    const uniqueCompletedIds = new Set();
+    const rawUniqueCompletedIds = new Set();
     allProgress.forEach((p) => {
-      p.completed.forEach((c) => uniqueCompletedIds.add(c.problemId.toString()));
+      p.completed.forEach((c) => rawUniqueCompletedIds.add(c.problemId.toString()));
     });
-    const allCompletedProblems = await Problem.find({ _id: { $in: [...uniqueCompletedIds] } }).lean();
+
+    const allCompletedProblems = await Problem.find({ 
+      _id: { $in: [...rawUniqueCompletedIds] },
+      isOptional: { $ne: true },
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    }).lean();
 
     const difficulties = { Easy: 0, Medium: 0, Hard: 0 };
     const topicPopularity = {};
@@ -612,8 +716,16 @@ const getPlatformStats = async (req, res, next) => {
       { $group: { _id: '$dailyGoal', count: { $sum: 1 } } },
     ]);
 
-    // Total problems in the platform
-    const totalProblems = await Problem.countDocuments();
+    // Total problems in the platform (CORE + LINKED ONLY)
+    const totalProblems = await Problem.countDocuments({ 
+      isOptional: { $ne: true }, 
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    });
 
     res.json({
       success: true,
@@ -623,7 +735,7 @@ const getPlatformStats = async (req, res, next) => {
         topTopics,
         goalDistribution: goalDist,
         totalProblems,
-        totalUniqueSolved: uniqueCompletedIds.size,
+        totalUniqueSolved: allCompletedProblems.length,
       },
     });
   } catch (err) {
@@ -651,14 +763,40 @@ const getLeaderboard = async (req, res, next) => {
       .select('userId completed')
       .lean();
 
-    const perUserSolved = {};
+    const rawUserSolved = {};
     const perUserDaysActive = {};
+    const allSolvedIdsAcrossLeaderboard = new Set();
     allProgress.forEach((p) => {
       const uid = p.userId.toString();
-      if (!perUserSolved[uid]) perUserSolved[uid] = new Set();
+      if (!rawUserSolved[uid]) rawUserSolved[uid] = new Set();
       if (!perUserDaysActive[uid]) perUserDaysActive[uid] = 0;
-      p.completed.forEach((c) => perUserSolved[uid].add(c.problemId.toString()));
+      p.completed.forEach((c) => {
+        const pid = c.problemId.toString();
+        rawUserSolved[uid].add(pid);
+        allSolvedIdsAcrossLeaderboard.add(pid);
+      });
       perUserDaysActive[uid]++;
+    });
+
+    // Batch metadata check for core problems
+    const coreProblemsAtLeaderboard = await Problem.find({ 
+      _id: { $in: [...allSolvedIdsAcrossLeaderboard] },
+      isOptional: { $ne: true },
+      isPremium: { $ne: true },
+      $or: [
+        { leetcodeSlug: { $type: "string", $nin: ["", "null"] } },
+        { gfgUrl: { $type: "string", $nin: ["", "null"] } },
+        { gfgLink: { $type: "string", $nin: ["", "null"] } }
+      ]
+    }).select('_id').lean();
+    const coreIdsSetLeaderboard = new Set(coreProblemsAtLeaderboard.map(p => p._id.toString()));
+
+    // Filter per-user solved sets
+    const perUserSolved = {};
+    Object.keys(rawUserSolved).forEach(uid => {
+      perUserSolved[uid] = new Set(
+        [...rawUserSolved[uid]].filter(pid => coreIdsSetLeaderboard.has(pid))
+      );
     });
 
     // Enrich users with real counts
@@ -830,6 +968,10 @@ const adminMarkProblem = async (req, res, next) => {
     progress.allDone = progress.completed.length >= progress.assigned.length;
     await progress.save();
 
+    if (solved) {
+      await updateStreak(userId);
+    }
+
     res.json({
       success: true,
       message: `Problem ${solved ? 'marked as solved' : 'unmarked'} for ${user.name}.`,
@@ -888,6 +1030,178 @@ const updateProblemAdmin = async (req, res, next) => {
   } catch(e) { next(e); }
 };
 
+const getUserFullSchedule = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const schedule = await Schedule.findOne({ userId: id })
+      .populate('days.problems.problemId', 'name difficulty topic leetcodeSlug slug gfgUrl youtubeUrl resourceUrl source isPremium isOptional')
+      .lean();
+
+    if (!schedule) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const progressDocs = await Progress.find({ userId: id })
+      .select('date allDone completed')
+      .lean();
+
+    const progressMap = {};
+    progressDocs.forEach((p) => {
+      const key = new Date(p.date).toISOString().split('T')[0];
+      progressMap[key] = { allDone: p.allDone, completedCount: p.completed.length, completedIds: p.completed.map(c => c.problemId.toString()) };
+    });
+
+    const enrichedDays = schedule.days.map((d) => {
+      const key = new Date(d.date).toISOString().split('T')[0];
+      const prog = progressMap[key] || {};
+      const completedSet = new Set(prog.completedIds || []);
+      
+      const enrichedProblems = d.problems ? d.problems.map(sp => ({
+        ...sp,
+        solved: completedSet.has(sp.problemId?._id?.toString())
+      })) : [];
+
+      return {
+        ...d,
+        problems: enrichedProblems,
+        allDone: prog.allDone || false,
+        completedCount: prog.completedCount || 0,
+        problemCount: d.problems ? d.problems.length : (d.problemIds?.length || 0),
+      };
+    });
+
+    res.json({ success: true, data: enrichedDays });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const adminReplaceProblem = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const { problemId } = req.body;
+    
+    const schedule = await Schedule.findOne({ userId });
+    if (!schedule) return next(createError('Schedule not found', 404));
+
+    let foundDay = null;
+    let foundIndex = -1;
+
+    for (const day of schedule.days) {
+      if (day.problems) {
+        const idx = day.problems.findIndex(p => p.problemId.toString() === problemId);
+        if (idx !== -1) { foundDay = day; foundIndex = idx; break; }
+      } else if (day.problemIds) {
+        const pIdx = day.problemIds.findIndex(id => id.toString() === problemId);
+        if (pIdx !== -1) { foundDay = day; foundIndex = pIdx; break; }
+      }
+    }
+
+    if (!foundDay) return next(createError('Problem not assigned in schedule', 400));
+
+    const allAssignedIds = new Set();
+    schedule.days.forEach(day => {
+      if (day.problems) day.problems.forEach(p => allAssignedIds.add(p.problemId.toString()));
+      if (day.problemIds) day.problemIds.forEach(id => allAssignedIds.add(id.toString()));
+    });
+
+    const oldProblem = await Problem.findById(problemId);
+    if (!oldProblem) return next(createError('Problem not found', 404));
+
+    const getCandidates = async (query, diffs, allowedTopics) => {
+      let cands = await Problem.find({ ...query, difficulty: { $in: diffs } }).lean();
+      if (allowedTopics) {
+        cands = cands.filter(p => allowedTopics.includes(p.topic));
+      }
+      return cands.filter(p => {
+         const validLc = (p.leetcodeSlug && p.leetcodeSlug !== 'null');
+         const validGfg = ((p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null'));
+         const isLcPremiumOpt = !!(p.leetcodeSlug && p.isPremium);
+         return (validLc || validGfg) && !isLcPremiumOpt;
+      });
+    };
+
+    let allowedDiffs = ['Easy', 'Medium'];
+    if (oldProblem.difficulty === 'Hard') allowedDiffs = ['Hard', 'Medium'];
+
+    let baseQuery = { _id: { $nin: [...allAssignedIds] }, isOptional: { $ne: true } };
+    let candidates = await getCandidates(baseQuery, allowedDiffs, [oldProblem.topic]);
+
+    if (candidates.length === 0) {
+      candidates = await getCandidates(baseQuery, allowedDiffs, null);
+    }
+
+    if (candidates.length === 0) {
+      const todayAssignedIds = new Set();
+      if (foundDay.problems) foundDay.problems.forEach(p => todayAssignedIds.add(p.problemId.toString()));
+      if (foundDay.problemIds) foundDay.problemIds.forEach(id => todayAssignedIds.add(id.toString()));
+      
+      const fallbackQuery = { _id: { $nin: [...todayAssignedIds] }, isOptional: { $ne: true } };
+      candidates = await getCandidates(fallbackQuery, allowedDiffs, [oldProblem.topic]);
+
+      if (candidates.length === 0) {
+        candidates = await getCandidates(fallbackQuery, allowedDiffs, null);
+      }
+    }
+
+    if (candidates.length === 0) {
+      return next(createError('No replacement problems available in the database.', 404));
+    }
+
+    const replacement = candidates[Math.floor(Math.random() * candidates.length)];
+
+    if (foundDay.problems) {
+      foundDay.problems[foundIndex].problemId = replacement._id;
+    } else if (foundDay.problemIds) {
+      foundDay.problemIds[foundIndex] = replacement._id;
+    }
+
+    schedule.markModified('days');
+    await schedule.save();
+
+    // Sync Progress doc if it exists for this day
+    const progressDate = new Date(foundDay.date);
+    const progress = await Progress.findOne({ userId, date: progressDate });
+    if (progress) {
+      let isChanged = false;
+      
+      // 1. Replace in assigned
+      const pIndex = progress.assigned.findIndex(id => id.toString() === problemId);
+      if (pIndex !== -1) {
+        progress.assigned[pIndex] = replacement._id;
+        isChanged = true;
+      }
+
+      // 2. Handle if it was already solved (REGEN = UNSOLVED)
+      const cIndex = progress.completed.findIndex(c => c.problemId.toString() === problemId);
+      if (cIndex !== -1) {
+        progress.completed = progress.completed.filter(c => c.problemId.toString() !== problemId);
+        // Decrement global count
+        const user = await User.findById(userId);
+        if (user) {
+          user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
+          await user.save();
+        }
+        isChanged = true;
+      }
+
+      // 3. Handle bookmarks
+      const bIndex = progress.bookmarked.findIndex(id => id.toString() === problemId);
+      if (bIndex !== -1) {
+        progress.bookmarked = progress.bookmarked.filter(id => id.toString() !== problemId);
+        isChanged = true;
+      }
+
+      if (isChanged) {
+        progress.allDone = progress.completed.length >= progress.assigned.length;
+        await progress.save();
+      }
+    }
+
+    res.json({ success: true, message: 'Problem regenerated successfully.', data: replacement });
+  } catch(err) { next(err); }
+};
+
 module.exports = {
   getDashboardOverview,
   getAllUsers,
@@ -901,4 +1215,6 @@ module.exports = {
   getReports,
   resolveReport,
   updateProblemAdmin,
+  getUserFullSchedule,
+  adminReplaceProblem,
 };

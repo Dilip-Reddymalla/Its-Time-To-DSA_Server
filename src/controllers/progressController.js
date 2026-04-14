@@ -190,7 +190,7 @@ const getSolvedJournal = async (req, res, next) => {
 
     // Fetch problem details in one shot
     const problems = await Problem.find({ _id: { $in: [...allProblemIds] } })
-      .select('name difficulty topic leetcodeSlug gfgUrl slug youtubeUrl resourceUrl')
+      .select('name difficulty topic leetcodeSlug gfgUrl slug youtubeUrl resourceUrl isPremium isOptional')
       .lean();
     const problemMap = {};
     problems.forEach((p) => { problemMap[p._id.toString()] = p; });
@@ -210,6 +210,15 @@ const getSolvedJournal = async (req, res, next) => {
         .map((c) => {
           const p = problemMap[c.problemId.toString()];
           if (!p) return null;
+          
+          // Exclude optional or premium problems from journal
+          if (p.isOptional || p.isPremium) return null;
+
+          // Exclude problems without valid links
+          const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+          const validGfg = (p.gfgUrl && p.gfgUrl !== 'null');
+          if (!validLc && !validGfg) return null;
+
           return {
             problemId: c.problemId,
             name: p.name,

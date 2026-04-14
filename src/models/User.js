@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
     longestStreak: { type: Number, default: 0 },
     restTokens: { type: Number, default: 1, max: 3 },
     totalSolved: { type: Number, default: 0 },
+    lastStreakUpdate: { type: Date, default: null },
 
     lastActiveAt: { type: Date, default: Date.now },
 

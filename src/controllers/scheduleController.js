@@ -344,6 +344,12 @@ const replaceProblem = async (req, res, next) => {
       const cIndex = progress.completed.findIndex(c => c.problemId.toString() === problemId);
       if (cIndex !== -1) {
           progress.completed = progress.completed.filter(c => c.problemId.toString() !== problemId);
+          // Decrement global count
+          const user = await User.findById(req.user._id);
+          if (user) {
+            user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
+            await user.save();
+          }
           isChanged = true;
       }
 
@@ -353,7 +359,10 @@ const replaceProblem = async (req, res, next) => {
          isChanged = true;
       }
 
-      if (isChanged) await progress.save();
+      if (isChanged) {
+        progress.allDone = progress.completed.length >= progress.assigned.length;
+        await progress.save();
+      }
     }
 
     res.json({ success: true, message: 'Problem replaced successfully.', data: replacement });
