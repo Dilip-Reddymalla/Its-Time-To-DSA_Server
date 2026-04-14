@@ -10,6 +10,8 @@ The Express.js + MongoDB backend powering the **Its-Time-To-DSA** platform. It h
 - **🗓️ Dynamic Schedule Engine** — Phase-based, difficulty-interleaved roadmap generator that scales to 60/90/120 days and respects user daily intensity goals (light/medium/intense)
 - **📈 LeetCode Sync** — Verifies solved problems against your LeetCode GraphQL API submissions
 - **📊 Stats API** — Heatmap data, topic breakdown, difficulty distribution, streak tracking
+- **🛡️ Admin Dashboard** — Platform-wide analytics, user progress audit, and problem health reporting
+- **🛠️ Problem Reporting System** — Automated triaging of broken links with a replacement engine for roadmap integrity
 - **🛡️ Security** — Helmet, CORS with credentials, express-rate-limit, input validation via express-validator
 - **🌱 Database Seeder** — Seeds the `problems` collection from real DSA CSV sheets (Arsh Goyal 45-60 Days, Shradha Ma'am 2.5 Months)
 
@@ -44,7 +46,9 @@ Its-Time-To-DSA_Server/
 │   ├── config/
 │   │   └── db.js                # Mongoose connection
 │   ├── controllers/
+│   │   ├── adminController.js      # Platform-wide metrics, user auditing
 │   │   ├── onboardingController.js  # Complete onboarding, validate LeetCode
+│   │   ├── problemController.js     # CRUD for DSA problems + health checks
 │   │   ├── progressController.js   # Log solves, bookmark, notes
 │   │   ├── scheduleController.js   # Today, overview, full schedule endpoints
 │   │   ├── statsController.js      # Heatmap, topic & difficulty breakdown
@@ -58,8 +62,10 @@ Its-Time-To-DSA_Server/
 │   │   ├── Schedule.js             # Generated roadmap (days[] with problems[])
 │   │   └── User.js                 # User profile + onboarding fields
 │   ├── routes/
+│   │   ├── admin.js                 # /api/admin/* (Stats, user lists, triage)
 │   │   ├── auth.js                 # /api/auth/* (Google OAuth, me, logout)
 │   │   ├── onboarding.js           # /api/onboarding/*
+│   │   ├── problem.js              # /api/problem/* (Reporting, replacement)
 │   │   ├── progress.js             # /api/progress/*
 │   │   ├── schedule.js             # /api/schedule/*
 │   │   ├── stats.js                # /api/stats
@@ -143,6 +149,23 @@ Server starts at **http://localhost:3001**
 | `GET` | `/google/callback` | OAuth callback, sets JWT cookie |
 | `GET` | `/me` | Returns current authenticated user |
 | `POST` | `/logout` | Clears JWT cookie |
+
+### Admin — `/api/admin` (Admin Role)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/stats` | Platform-wide metrics (Daily active, total solves) |
+| `GET` | `/users` | Paginated list of all registered users |
+| `GET` | `/users/:id` | Detailed user profile + activity history |
+| `GET` | `/reports` | Aggregated reports of broken problems |
+
+### Problems — `/api/problem`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/report` | Flag a problem as broken or invalid |
+| `GET` | `/:id` | Get problem metadata |
+| `PATCH` | `/:id` | Update problem metadata (Admin) |
 
 ### Onboarding — `/api/onboarding`
 
