@@ -136,7 +136,7 @@ const getDashboardOverview = async (req, res, next) => {
 
     // Compute REAL total solved across the platform from Progress docs (deduplicated)
     const allProgress = await Progress.find({ 'completed.0': { $exists: true } })
-      .select('userId completed')
+      .select('userId completed.problemId')
       .lean();
     
     const rawUniqueSolvedIds = new Set();
@@ -288,7 +288,7 @@ const getAllUsers = async (req, res, next) => {
     const userIds = users.map((u) => u._id);
 
     // Get ALL progress docs for these users to calculate realTotalSolved
-    const allProgressDocs = await Progress.find({ userId: { $in: userIds }, 'completed.0': { $exists: true } }).select('userId completed').lean();
+    const allProgressDocs = await Progress.find({ userId: { $in: userIds }, 'completed.0': { $exists: true } }).select('userId completed.problemId').lean();
     
     // Calculate realTotalSolved
     const rawSolvedMap = {};
@@ -679,7 +679,7 @@ const getPlatformStats = async (req, res, next) => {
 
     // Difficulty distribution across all solved problems (DEDUPLICATED)
     const allProgress = await Progress.find({ 'completed.0': { $exists: true } })
-      .select('completed')
+      .select('completed.problemId')
       .lean();
     const rawUniqueCompletedIds = new Set();
     allProgress.forEach((p) => {
@@ -760,7 +760,7 @@ const getLeaderboard = async (req, res, next) => {
       userId: { $in: userIds },
       'completed.0': { $exists: true },
     })
-      .select('userId completed')
+      .select('userId completed.problemId')
       .lean();
 
     const rawUserSolved = {};
@@ -1084,20 +1084,19 @@ const adminReplaceProblem = async (req, res, next) => {
     const schedule = await Schedule.findOne({ userId });
     if (!schedule) return next(createError('Schedule not found', 404));
 
-    let foundDay = null;
-    let foundIndex = -1;
+    let dayOccurrences = [];
 
     for (const day of schedule.days) {
       if (day.problems) {
         const idx = day.problems.findIndex(p => p.problemId.toString() === problemId);
-        if (idx !== -1) { foundDay = day; foundIndex = idx; break; }
+        if (idx !== -1) dayOccurrences.push({ day, index: idx });
       } else if (day.problemIds) {
         const pIdx = day.problemIds.findIndex(id => id.toString() === problemId);
-        if (pIdx !== -1) { foundDay = day; foundIndex = pIdx; break; }
+        if (pIdx !== -1) dayOccurrences.push({ day, index: pIdx });
       }
     }
 
-    if (!foundDay) return next(createError('Problem not assigned in schedule', 400));
+    if (dayOccurrences.length === 0) return next(createError('Problem not assigned in schedule', 400));
 
     const allAssignedIds = new Set();
     schedule.days.forEach(day => {
@@ -1133,8 +1132,10 @@ const adminReplaceProblem = async (req, res, next) => {
 
     if (candidates.length === 0) {
       const todayAssignedIds = new Set();
-      if (foundDay.problems) foundDay.problems.forEach(p => todayAssignedIds.add(p.problemId.toString()));
-      if (foundDay.problemIds) foundDay.problemIds.forEach(id => todayAssignedIds.add(id.toString()));
+      dayOccurrences.forEach(occ => {
+        if (occ.day.problems) occ.day.problems.forEach(p => todayAssignedIds.add(p.problemId.toString()));
+        if (occ.day.problemIds) occ.day.problemIds.forEach(id => todayAssignedIds.add(id.toString()));
+      });
       
       const fallbackQuery = { _id: { $nin: [...todayAssignedIds] }, isOptional: { $ne: true } };
       candidates = await getCandidates(fallbackQuery, allowedDiffs, [oldProblem.topic]);
@@ -1150,19 +1151,24 @@ const adminReplaceProblem = async (req, res, next) => {
 
     const replacement = candidates[Math.floor(Math.random() * candidates.length)];
 
-    if (foundDay.problems) {
-      foundDay.problems[foundIndex].problemId = replacement._id;
-    } else if (foundDay.problemIds) {
-      foundDay.problemIds[foundIndex] = replacement._id;
+    for (const occ of dayOccurrences) {
+      if (occ.day.problems) {
+        occ.day.problems[occ.index].problemId = replacement._id;
+      } else if (occ.day.problemIds) {
+        occ.day.problemIds[occ.index] = replacement._id;
+      }
     }
 
     schedule.markModified('days');
     await schedule.save();
 
-    // Sync Progress doc if it exists for this day
-    const progressDate = new Date(foundDay.date);
-    const progress = await Progress.findOne({ userId, date: progressDate });
-    if (progress) {
+    // Sync Progress docs across occurrences
+    const progressDates = dayOccurrences.map(occ => new Date(occ.day.date));
+    const progresses = await Progress.find({ userId, date: { $in: progressDates } });
+    
+    let isUserTotalSolvedDecremented = false;
+
+    for (const progress of progresses) {
       let isChanged = false;
       
       // 1. Replace in assigned
@@ -1172,15 +1178,17 @@ const adminReplaceProblem = async (req, res, next) => {
         isChanged = true;
       }
 
-      // 2. Handle if it was already solved (REGEN = UNSOLVED)
+      // 2. Handle if it was already solved
       const cIndex = progress.completed.findIndex(c => c.problemId.toString() === problemId);
       if (cIndex !== -1) {
         progress.completed = progress.completed.filter(c => c.problemId.toString() !== problemId);
-        // Decrement global count
-        const user = await User.findById(userId);
-        if (user) {
-          user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
-          await user.save();
+        if (!isUserTotalSolvedDecremented) {
+          const user = await User.findById(userId);
+          if (user) {
+            user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
+            await user.save();
+            isUserTotalSolvedDecremented = true;
+          }
         }
         isChanged = true;
       }
@@ -1202,6 +1210,77 @@ const adminReplaceProblem = async (req, res, next) => {
   } catch(err) { next(err); }
 };
 
+const adminRemoveProblem = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const { problemId } = req.body;
+    
+    const schedule = await Schedule.findOne({ userId });
+    if (!schedule) return next(createError('Schedule not found', 404));
+
+    let removed = false;
+
+    for (const day of schedule.days) {
+      if (day.problems) {
+        const initialLength = day.problems.length;
+        day.problems = day.problems.filter(p => p.problemId.toString() !== problemId);
+        if (day.problems.length !== initialLength) removed = true;
+      } else if (day.problemIds) {
+        const initialLength = day.problemIds.length;
+        day.problemIds = day.problemIds.filter(id => id.toString() !== problemId);
+        if (day.problemIds.length !== initialLength) removed = true;
+      }
+    }
+
+    if (!removed) return next(createError('Problem not found in schedule', 404));
+
+    schedule.markModified('days');
+    await schedule.save();
+
+    // Sync Progress docs across all occurrences
+    const progresses = await Progress.find({ userId });
+    
+    let isUserTotalSolvedDecremented = false;
+
+    for (const progress of progresses) {
+      let isChanged = false;
+      
+      const pIndex = progress.assigned.findIndex(id => id.toString() === problemId);
+      if (pIndex !== -1) {
+        progress.assigned = progress.assigned.filter(id => id.toString() !== problemId);
+        isChanged = true;
+      }
+
+      const cIndex = progress.completed.findIndex(c => c.problemId.toString() === problemId);
+      if (cIndex !== -1) {
+        progress.completed = progress.completed.filter(c => c.problemId.toString() !== problemId);
+        if (!isUserTotalSolvedDecremented) {
+          const user = await User.findById(userId);
+          if (user) {
+            user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
+            await user.save();
+            isUserTotalSolvedDecremented = true;
+          }
+        }
+        isChanged = true;
+      }
+
+      const bIndex = progress.bookmarked.findIndex(id => id.toString() === problemId);
+      if (bIndex !== -1) {
+        progress.bookmarked = progress.bookmarked.filter(id => id.toString() !== problemId);
+        isChanged = true;
+      }
+
+      if (isChanged) {
+        progress.allDone = progress.assigned.length === 0 ? false : progress.completed.length >= progress.assigned.length;
+        await progress.save();
+      }
+    }
+
+    res.json({ success: true, message: 'Problem removed successfully.' });
+  } catch(err) { next(err); }
+};
+
 module.exports = {
   getDashboardOverview,
   getAllUsers,
@@ -1217,4 +1296,5 @@ module.exports = {
   updateProblemAdmin,
   getUserFullSchedule,
   adminReplaceProblem,
+  adminRemoveProblem,
 };

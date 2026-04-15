@@ -30,4 +30,19 @@ const generalLimiter = rateLimit({
   },
 });
 
-module.exports = { verifyLimiter, generalLimiter };
+/**
+ * Admin API limiter (500 req/min)
+ */
+const adminLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many admin requests.',
+    code: 'RATE_LIMITED',
+  },
+});
+
+module.exports = { verifyLimiter, generalLimiter, adminLimiter };

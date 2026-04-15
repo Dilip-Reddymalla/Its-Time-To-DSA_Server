@@ -15,6 +15,7 @@ const {
   updateProblemAdmin,
   getUserFullSchedule,
   adminReplaceProblem,
+  adminRemoveProblem,
 } = require('../controllers/adminController');
 
 // ─── Read-Only Endpoints ─────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ router.get('/leaderboard', getLeaderboard);
 router.post('/users/:id/ban', toggleBanUser);
 router.post('/mark-problem', adminMarkProblem);
 router.post('/users/:id/replace-problem', adminReplaceProblem);
+router.post('/users/:id/remove-problem', adminRemoveProblem);
 router.put('/reports/:id/resolve', resolveReport);
 router.put('/problems/:id', updateProblemAdmin);
 

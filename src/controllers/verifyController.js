@@ -50,13 +50,14 @@ const verifySubmissions = async (req, res, next) => {
     const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
 
     // --- CARRY-OVER Logic: find previously assigned problems that haven't been completed ---
-    const allProgressDocs = await Progress.find({ userId: req.user._id }).lean();
+    const allProgressDocs = await Progress.find({ 
+      userId: req.user._id,
+      date: { $lt: targetDate } 
+    }).select('completed').lean();
+    
     const globalCompletedBeforeToday = new Set();
     allProgressDocs.forEach((p) => {
-      const pDateStr = toISTDateString(new Date(p.date));
-      if (pDateStr < todayStr) {
-        (p.completed || []).forEach(c => globalCompletedBeforeToday.add(c.problemId.toString()));
-      }
+      (p.completed || []).forEach(c => globalCompletedBeforeToday.add(c.problemId.toString()));
     });
 
     const alreadyIncludedIds = new Set(problemIds.map(id => id.toString()));

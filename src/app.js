@@ -19,8 +19,10 @@ const adminRoutes = require('./routes/admin');
 const { errorHandler } = require('./middleware/errorHandler');
 const { authGuard } = require('./middleware/authGuard');
 const { adminGuard } = require('./middleware/adminGuard');
+const { generalLimiter, adminLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ─── Security & Parsing Middleware ────────────────────────────────────────────
 app.use(helmet({
@@ -49,17 +51,17 @@ app.get('/health', (req, res) => {
 });
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', generalLimiter, authRoutes);
 
 // ─── Protected Routes ─────────────────────────────────────────────────────────
-app.use('/api/onboarding', authGuard, onboardingRoutes);
-app.use('/api/schedule', authGuard, scheduleRoutes);
-app.use('/api/progress', authGuard, progressRoutes);
-app.use('/api/verify', authGuard, verifyRoutes);
-app.use('/api/stats', authGuard, statsRoutes);
-app.use('/api/user', authGuard, userRoutes);
-app.use('/api/problems', authGuard, problemRoutes);
-app.use('/api/admin', authGuard, adminGuard, adminRoutes);
+app.use('/api/onboarding', generalLimiter, authGuard, onboardingRoutes);
+app.use('/api/schedule', generalLimiter, authGuard, scheduleRoutes);
+app.use('/api/progress', generalLimiter, authGuard, progressRoutes);
+app.use('/api/verify', generalLimiter, authGuard, verifyRoutes);
+app.use('/api/stats', generalLimiter, authGuard, statsRoutes);
+app.use('/api/user', generalLimiter, authGuard, userRoutes);
+app.use('/api/problems', generalLimiter, authGuard, problemRoutes);
+app.use('/api/admin', adminLimiter, authGuard, adminGuard, adminRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {

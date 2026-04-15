@@ -48,7 +48,7 @@ const getProblemPremiumStatus = async (titleSlug) => {
  * Fetch the last N accepted submissions for a LeetCode username.
  * Returns array of { id, title, titleSlug, timestamp }
  */
-const verifyLeetCodeSubmissions = async (username, limit = 50) => {
+const verifyLeetCodeSubmissions = async (username, limit = 50, retryCount = 1) => {
   try {
     const response = await axios.post(
       LC_GRAPHQL_URL,
@@ -64,7 +64,7 @@ const verifyLeetCodeSubmissions = async (username, limit = 50) => {
           'x-csrftoken': 'nocheck',
           'Cookie': 'csrftoken=nocheck',
         },
-        timeout: 8000,
+        timeout: 12000,
       }
     );
 
@@ -77,6 +77,11 @@ const verifyLeetCodeSubmissions = async (username, limit = 50) => {
     // Add statusDisplay for compatibility
     return submissions.map((s) => ({ ...s, statusDisplay: 'Accepted' }));
   } catch (err) {
+    if (retryCount > 0) {
+      console.warn(`⏳ LeetCode API timeout/error for ${username}, retrying in 2s...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return verifyLeetCodeSubmissions(username, limit, retryCount - 1);
+    }
     console.error(`❌ LeetCode API error for ${username}:`, err.message);
     throw new Error(`Could not fetch LeetCode submissions: ${err.message}`);
   }

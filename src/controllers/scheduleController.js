@@ -253,20 +253,19 @@ const replaceProblem = async (req, res, next) => {
     const schedule = await Schedule.findOne({ userId: req.user._id });
     if (!schedule) return next(createError('Schedule not found', 404));
 
-    let foundDay = null;
-    let foundIndex = -1;
+    let dayOccurrences = [];
 
     for (const day of schedule.days) {
       if (day.problems) {
         const idx = day.problems.findIndex(p => p.problemId.toString() === problemId);
-        if (idx !== -1) { foundDay = day; foundIndex = idx; break; }
+        if (idx !== -1) dayOccurrences.push({ day, index: idx });
       } else if (day.problemIds) {
         const pIdx = day.problemIds.findIndex(id => id.toString() === problemId);
-        if (pIdx !== -1) { foundDay = day; foundIndex = pIdx; break; }
+        if (pIdx !== -1) dayOccurrences.push({ day, index: pIdx });
       }
     }
 
-    if (!foundDay) return next(createError('Problem not assigned in schedule', 400));
+    if (dayOccurrences.length === 0) return next(createError('Problem not assigned in schedule', 400));
 
     const allAssignedIds = new Set();
     schedule.days.forEach(day => {
@@ -302,10 +301,11 @@ const replaceProblem = async (req, res, next) => {
 
     if (candidates.length === 0) {
       // Fallback: The entire DB is already in the schedule!
-      // Pick a problem that is simply NOT assigned TODAY.
       const todayAssignedIds = new Set();
-      if (foundDay.problems) foundDay.problems.forEach(p => todayAssignedIds.add(p.problemId.toString()));
-      if (foundDay.problemIds) foundDay.problemIds.forEach(id => todayAssignedIds.add(id.toString()));
+      dayOccurrences.forEach(occ => {
+        if (occ.day.problems) occ.day.problems.forEach(p => todayAssignedIds.add(p.problemId.toString()));
+        if (occ.day.problemIds) occ.day.problemIds.forEach(id => todayAssignedIds.add(id.toString()));
+      });
       
       const fallbackQuery = { _id: { $nin: [...todayAssignedIds] }, isOptional: { $ne: true } };
       candidates = await getCandidates(fallbackQuery, allowedDiffs, [oldProblem.topic]);
@@ -321,19 +321,24 @@ const replaceProblem = async (req, res, next) => {
 
     const replacement = candidates[Math.floor(Math.random() * candidates.length)];
 
-    if (foundDay.problems) {
-      foundDay.problems[foundIndex].problemId = replacement._id;
-    } else if (foundDay.problemIds) {
-      foundDay.problemIds[foundIndex] = replacement._id;
+    for (const occ of dayOccurrences) {
+      if (occ.day.problems) {
+        occ.day.problems[occ.index].problemId = replacement._id;
+      } else if (occ.day.problemIds) {
+        occ.day.problemIds[occ.index] = replacement._id;
+      }
     }
 
     schedule.markModified('days');
     await schedule.save();
     
-    // Attempt to update progress if assigned today
-    const currentDayStart = getEffectiveTodayIST();
-    const progress = await Progress.findOne({ userId: req.user._id, date: currentDayStart });
-    if (progress) {
+    // Attempt to update progress if assigned across occurrences
+    const progressDates = dayOccurrences.map(occ => new Date(occ.day.date));
+    const progresses = await Progress.find({ userId: req.user._id, date: { $in: progressDates } });
+    
+    let isUserTotalSolvedDecremented = false;
+
+    for (const progress of progresses) {
       let isChanged = false;
       const pIndex = progress.assigned.findIndex(id => id.toString() === problemId);
       if (pIndex !== -1) {
@@ -344,11 +349,14 @@ const replaceProblem = async (req, res, next) => {
       const cIndex = progress.completed.findIndex(c => c.problemId.toString() === problemId);
       if (cIndex !== -1) {
           progress.completed = progress.completed.filter(c => c.problemId.toString() !== problemId);
-          // Decrement global count
-          const user = await User.findById(req.user._id);
-          if (user) {
-            user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
-            await user.save();
+          // Decrement global count (only once per user, even if solved multiple times)
+          if (!isUserTotalSolvedDecremented) {
+            const user = await User.findById(req.user._id);
+            if (user) {
+              user.totalSolved = Math.max(0, (user.totalSolved || 0) - 1);
+              await user.save();
+              isUserTotalSolvedDecremented = true;
+            }
           }
           isChanged = true;
       }
