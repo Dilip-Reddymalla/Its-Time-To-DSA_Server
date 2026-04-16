@@ -129,6 +129,16 @@ npm run seed
 
 This reads the two CSV files and upserts problems into the `problems` collection.
 
+### Backfill LeetCode Submission Links
+
+If you already have solved progress records but missing `submissionUrl` values, run the backfill script:
+
+```bash
+npm run backfill:submissions
+```
+
+The script reads each user's accepted LeetCode submissions through GraphQL, matches them to progress entries by `leetcodeSlug`, and stores the submission link in MongoDB.
+
 ### Run Development Server
 
 ```bash

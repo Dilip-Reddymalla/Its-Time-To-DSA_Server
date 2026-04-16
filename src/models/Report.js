@@ -17,6 +17,9 @@ const reportSchema = new mongoose.Schema(
     },
     resolvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     resolvedAt: { type: Date, default: null },
+    adminApprovedReplacement: { type: Boolean, default: false },
+    replacementApprovedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    replacementApprovedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

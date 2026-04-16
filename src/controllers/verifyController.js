@@ -2,7 +2,7 @@ const Problem = require('../models/Problem');
 const Progress = require('../models/Progress');
 const Schedule = require('../models/Schedule');
 const User = require('../models/User');
-const { verifyLeetCodeSubmissions } = require('../services/leetcodeService');
+const { verifyLeetCodeSubmissions, buildSubmissionUrl } = require('../services/leetcodeService');
 const { updateStreak } = require('../services/streakService');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
@@ -82,13 +82,21 @@ const verifySubmissions = async (req, res, next) => {
     const allProblemIdsToVerify = [...problemIds, ...carryoverProblemIds];
     const problems = await Problem.find({ _id: { $in: allProblemIdsToVerify } }).lean();
     const submissions = await verifyLeetCodeSubmissions(req.user.leetcodeUsername);
-    const acceptedSlugs = new Set(submissions.map((s) => s.titleSlug));
+    const submissionBySlug = new Map();
+    submissions.forEach((s) => {
+      if (!submissionBySlug.has(s.titleSlug)) {
+        submissionBySlug.set(s.titleSlug, s);
+      }
+    });
+    const acceptedSlugs = new Set(submissionBySlug.keys());
 
     let newlySolvedCount = 0;
     const updated = [];
     for (const problem of problems) {
       if (!problem.leetcodeSlug) continue;
       const solved = acceptedSlugs.has(problem.leetcodeSlug);
+      const matchedSubmission = submissionBySlug.get(problem.leetcodeSlug);
+      const submissionUrl = buildSubmissionUrl(matchedSubmission?.id);
       
       if (solved) {
         const existingCompletion = progress.completed.find(
@@ -97,16 +105,26 @@ const verifySubmissions = async (req, res, next) => {
 
         if (!existingCompletion) {
           // Brand new solve found via verification
-          progress.completed.push({ problemId: problem._id, solvedAt: new Date(), verifiedViaLC: true });
+          progress.completed.push({
+            problemId: problem._id,
+            solvedAt: new Date(),
+            verifiedViaLC: true,
+            submissionId: matchedSubmission?.id || null,
+            submissionUrl,
+          });
           newlySolvedCount++;
         } else if (!existingCompletion.verifiedViaLC) {
           // Was manually marked before, now verified via LC
           existingCompletion.verifiedViaLC = true;
+          if (submissionUrl) {
+            existingCompletion.submissionId = matchedSubmission?.id || null;
+            existingCompletion.submissionUrl = submissionUrl;
+          }
           // We don't increment newlySolvedCount here because totalSolved was already 
           // incremented when the problem was manually marked.
         }
       }
-      updated.push({ slug: problem.leetcodeSlug, solved });
+      updated.push({ slug: problem.leetcodeSlug, solved, submissionUrl: solved ? submissionUrl : null });
     }
 
     const totalAssigned = dayEntry.problems ? dayEntry.problems.length : (dayEntry.problemIds?.length || progress.assigned?.length || 0);

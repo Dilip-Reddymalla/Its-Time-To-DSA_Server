@@ -11,9 +11,11 @@ const {
   toggleBanUser,
   adminMarkProblem,
   getReports,
+  approveReportReplacement,
   resolveReport,
   updateProblemAdmin,
   getUserFullSchedule,
+  addCustomQuestionToDay,
   adminReplaceProblem,
   adminRemoveProblem,
 } = require('../controllers/adminController');
@@ -34,6 +36,8 @@ router.post('/users/:id/ban', toggleBanUser);
 router.post('/mark-problem', adminMarkProblem);
 router.post('/users/:id/replace-problem', adminReplaceProblem);
 router.post('/users/:id/remove-problem', adminRemoveProblem);
+router.post('/users/:id/custom-question', addCustomQuestionToDay);
+router.put('/reports/:id/approve-replacement', approveReportReplacement);
 router.put('/reports/:id/resolve', resolveReport);
 router.put('/problems/:id', updateProblemAdmin);
 

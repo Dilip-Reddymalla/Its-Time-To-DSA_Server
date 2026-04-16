@@ -30,6 +30,14 @@ const getToday = async (req, res, next) => {
     const notesMap = {};
     (progress?.notes || []).forEach((n) => { notesMap[n.problemId.toString()] = n.text; });
 
+    const approvedReports = await Report.find({
+      userId: req.user._id,
+      adminApprovedReplacement: true,
+    })
+      .select('problemId')
+      .lean();
+    const approvedReplacementSet = new Set(approvedReports.map((r) => r.problemId.toString()));
+
     const enrichedProblems = problems.map((p) => {
       const schedProb = dayEntry.problems?.find(sp => sp.problemId.toString() === p._id.toString());
       return {
@@ -40,6 +48,7 @@ const getToday = async (req, res, next) => {
         solved: completedIds.has(p._id.toString()),
         bookmarked: bookmarkedIds.has(p._id.toString()),
         note: notesMap[p._id.toString()] || '',
+        canReplace: approvedReplacementSet.has(p._id.toString()),
       };
     });
 
@@ -101,6 +110,7 @@ const getToday = async (req, res, next) => {
           solved: completedIds.has(p._id.toString()),
           bookmarked: bookmarkedIds.has(p._id.toString()),
           note: notesMap[p._id.toString()] || '',
+          canReplace: approvedReplacementSet.has(p._id.toString()),
         });
       });
     }

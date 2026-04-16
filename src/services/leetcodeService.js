@@ -2,6 +2,11 @@ const axios = require('axios');
 
 const LC_GRAPHQL_URL = 'https://leetcode.com/graphql';
 
+const buildSubmissionUrl = (submissionId) => {
+  if (!submissionId) return null;
+  return `https://leetcode.com/submissions/detail/${submissionId}/`;
+};
+
 const RECENT_SUBMISSIONS_QUERY = `
   query recentAcSubmissions($username: String!, $limit: Int!) {
     recentAcSubmissionList(username: $username, limit: $limit) {
@@ -119,4 +124,4 @@ const validateLeetCodeUser = async (username) => {
   }
 };
 
-module.exports = { verifyLeetCodeSubmissions, validateLeetCodeUser, getProblemPremiumStatus };
+module.exports = { verifyLeetCodeSubmissions, validateLeetCodeUser, getProblemPremiumStatus, buildSubmissionUrl };

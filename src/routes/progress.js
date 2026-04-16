@@ -1,37 +1,47 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 const {
   getAllProgress,
   getTodayProgress,
   markProblem,
   addNote,
+  setSubmissionLink,
   toggleBookmark,
   getSolvedJournal,
-} = require('../controllers/progressController');
+} = require("../controllers/progressController");
 
 const router = express.Router();
 
-router.get('/', getAllProgress);
-router.get('/today', getTodayProgress);
+router.get("/", getAllProgress);
+router.get("/today", getTodayProgress);
 
 router.patch(
-  '/mark',
-  [body('problemId').notEmpty().isMongoId(), body('solved').isBoolean()],
-  markProblem
+  "/mark",
+  [body("problemId").notEmpty().isMongoId(), body("solved").isBoolean()],
+  markProblem,
 );
 
 router.post(
-  '/note',
-  [body('problemId').notEmpty().isMongoId(), body('text').isString()],
-  addNote
+  "/note",
+  [body("problemId").notEmpty().isMongoId(), body("text").isString()],
+  addNote,
 );
 
 router.post(
-  '/bookmark',
-  [body('problemId').notEmpty().isMongoId()],
-  toggleBookmark
+  "/submission-link",
+  [
+    body("problemId").notEmpty().isMongoId(),
+    body("submissionUrl").notEmpty().isURL(),
+  ],
+  setSubmissionLink,
 );
 
-router.get('/journal', getSolvedJournal);
+router.post(
+  "/bookmark",
+  [body("problemId").notEmpty().isMongoId()],
+  toggleBookmark,
+);
+
+router.get("/journal", getSolvedJournal);
 
 module.exports = router;

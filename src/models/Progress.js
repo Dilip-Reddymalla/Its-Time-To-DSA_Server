@@ -17,6 +17,8 @@ const progressSchema = new mongoose.Schema(
         problemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' },
         solvedAt: { type: Date, default: Date.now },
         verifiedViaLC: { type: Boolean, default: false },
+        submissionId: { type: String, default: null },
+        submissionUrl: { type: String, default: null },
       },
     ],
 

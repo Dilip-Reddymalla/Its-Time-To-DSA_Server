@@ -1,16 +1,15 @@
-const Progress = require('../models/Progress');
-const Problem = require('../models/Problem');
-const Schedule = require('../models/Schedule');
-const User = require('../models/User');
-const { createError } = require('../middleware/errorHandler');
-const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
-
+const Progress = require("../models/Progress");
+const Problem = require("../models/Problem");
+const Schedule = require("../models/Schedule");
+const User = require("../models/User");
+const { createError } = require("../middleware/errorHandler");
+const { getEffectiveTodayIST, toISTDateString } = require("../utils/dateUtils");
 
 const getAllProgress = async (req, res, next) => {
   try {
     const progress = await Progress.find({ userId: req.user._id })
       .sort({ date: -1 })
-      .populate('assigned', 'name difficulty topic')
+      .populate("assigned", "name difficulty topic")
       .lean();
     res.json({ success: true, data: progress });
   } catch (err) {
@@ -22,8 +21,11 @@ const getTodayProgress = async (req, res, next) => {
   try {
     const today = getEffectiveTodayIST();
     let progress = await Progress.findOne({ userId: req.user._id, date: today })
-      .populate('assigned', 'name difficulty topic slug leetcodeSlug dryRunResources')
-      .populate('completed.problemId', 'name')
+      .populate(
+        "assigned",
+        "name difficulty topic slug leetcodeSlug dryRunResources",
+      )
+      .populate("completed.problemId", "name")
       .lean();
 
     if (!progress) {
@@ -56,7 +58,10 @@ const markProblem = async (req, res, next) => {
     const today = getEffectiveTodayIST();
 
     // Find or auto-create today's progress doc (upsert)
-    let progress = await Progress.findOne({ userId: req.user._id, date: today });
+    let progress = await Progress.findOne({
+      userId: req.user._id,
+      date: today,
+    });
     if (!progress) {
       // Pull the assigned problem IDs from today's schedule to build the doc
       const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
@@ -64,16 +69,23 @@ const markProblem = async (req, res, next) => {
       const dayEntry = schedule?.days.find((d) => {
         return toISTDateString(new Date(d.date)) === todayStr;
       });
-      const rawAssignedIds = dayEntry?.problems?.map(p => p.problemId) || dayEntry?.problemIds || [];
-      const populatedProblems = await Problem.find({ _id: { $in: rawAssignedIds } }).lean();
+      const rawAssignedIds =
+        dayEntry?.problems?.map((p) => p.problemId) ||
+        dayEntry?.problemIds ||
+        [];
+      const populatedProblems = await Problem.find({
+        _id: { $in: rawAssignedIds },
+      }).lean();
       const validAssignedIds = populatedProblems
-        .filter(p => {
-          const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
-          const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
+        .filter((p) => {
+          const validLc = p.leetcodeSlug && p.leetcodeSlug !== "null";
+          const validGfg =
+            (p.gfgUrl && p.gfgUrl !== "null") ||
+            (p.gfgLink && p.gfgLink !== "null");
           return !!(validLc || validGfg);
         })
-        .map(p => p._id.toString());
-        
+        .map((p) => p._id.toString());
+
       progress = await Progress.create({
         userId: req.user._id,
         date: today,
@@ -83,16 +95,28 @@ const markProblem = async (req, res, next) => {
     }
 
     if (solved) {
-      const already = progress.completed.find((c) => c.problemId.toString() === problemId);
+      const already = progress.completed.find(
+        (c) => c.problemId.toString() === problemId,
+      );
       if (!already) {
-        progress.completed.push({ problemId, solvedAt: new Date(), verifiedViaLC: false });
-        await User.findByIdAndUpdate(req.user._id, { $inc: { totalSolved: 1 } });
+        progress.completed.push({
+          problemId,
+          solvedAt: new Date(),
+          verifiedViaLC: false,
+        });
+        await User.findByIdAndUpdate(req.user._id, {
+          $inc: { totalSolved: 1 },
+        });
       }
     } else {
-      const alreadyIndex = progress.completed.findIndex((c) => c.problemId.toString() === problemId);
+      const alreadyIndex = progress.completed.findIndex(
+        (c) => c.problemId.toString() === problemId,
+      );
       if (alreadyIndex !== -1) {
         progress.completed.splice(alreadyIndex, 1);
-        await User.findByIdAndUpdate(req.user._id, { $inc: { totalSolved: -1 } });
+        await User.findByIdAndUpdate(req.user._id, {
+          $inc: { totalSolved: -1 },
+        });
       }
     }
 
@@ -117,10 +141,16 @@ const addNote = async (req, res, next) => {
       targetDate = getEffectiveTodayIST();
     }
 
-    let progress = await Progress.findOne({ userId: req.user._id, date: targetDate });
-    if (!progress) return next(createError('No progress entry for that day.', 404));
+    let progress = await Progress.findOne({
+      userId: req.user._id,
+      date: targetDate,
+    });
+    if (!progress)
+      return next(createError("No progress entry for that day.", 404));
 
-    const existing = progress.notes.find((n) => n.problemId.toString() === problemId);
+    const existing = progress.notes.find(
+      (n) => n.problemId.toString() === problemId,
+    );
     if (existing) {
       existing.text = text;
       existing.updatedAt = new Date();
@@ -129,7 +159,54 @@ const addNote = async (req, res, next) => {
     }
 
     await progress.save();
-    res.json({ success: true, message: 'Note saved.' });
+    res.json({ success: true, message: "Note saved." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const setSubmissionLink = async (req, res, next) => {
+  try {
+    const { problemId, submissionUrl, date: dateParam } = req.body;
+
+    let targetDate;
+    if (dateParam) {
+      targetDate = new Date(dateParam);
+    } else {
+      targetDate = getEffectiveTodayIST();
+    }
+
+    let parsed;
+    try {
+      parsed = new URL(submissionUrl);
+    } catch {
+      return next(createError("Invalid submission URL.", 400));
+    }
+
+    const hostname = parsed.hostname.toLowerCase();
+    if (!hostname.includes("leetcode.com")) {
+      return next(
+        createError("Submission URL must be from leetcode.com.", 400),
+      );
+    }
+
+    const progress = await Progress.findOne({
+      userId: req.user._id,
+      date: targetDate,
+    });
+    if (!progress)
+      return next(createError("No progress entry for that day.", 404));
+
+    const completion = progress.completed.find(
+      (c) => c.problemId.toString() === problemId,
+    );
+    if (!completion)
+      return next(createError("Problem not marked solved for that day.", 400));
+
+    completion.submissionUrl = submissionUrl.trim();
+    await progress.save();
+
+    res.json({ success: true, message: "Submission link saved." });
   } catch (err) {
     next(err);
   }
@@ -140,10 +217,16 @@ const toggleBookmark = async (req, res, next) => {
     const { problemId } = req.body;
     const today = getEffectiveTodayIST();
 
-    const progress = await Progress.findOne({ userId: req.user._id, date: today });
-    if (!progress) return next(createError('No progress entry for today.', 404));
+    const progress = await Progress.findOne({
+      userId: req.user._id,
+      date: today,
+    });
+    if (!progress)
+      return next(createError("No progress entry for today.", 404));
 
-    const idx = progress.bookmarked.findIndex((id) => id.toString() === problemId);
+    const idx = progress.bookmarked.findIndex(
+      (id) => id.toString() === problemId,
+    );
     if (idx > -1) {
       progress.bookmarked.splice(idx, 1);
     } else {
@@ -165,19 +248,23 @@ const toggleBookmark = async (req, res, next) => {
 const getSolvedJournal = async (req, res, next) => {
   try {
     const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
-    if (!schedule) return next(createError('No schedule found.', 404));
+    if (!schedule) return next(createError("No schedule found.", 404));
 
     // Build a map: date-string -> dayNumber
     const dayNumberMap = {};
     schedule.days.forEach((d) => {
-      const key = new Date(d.date).toISOString().split('T')[0];
-      dayNumberMap[key] = { dayNumber: d.dayNumber, date: d.date, type: d.type };
+      const key = new Date(d.date).toISOString().split("T")[0];
+      dayNumberMap[key] = {
+        dayNumber: d.dayNumber,
+        date: d.date,
+        type: d.type,
+      };
     });
 
     // Fetch all progress docs that have at least one completed problem
     const progressDocs = await Progress.find({
       userId: req.user._id,
-      'completed.0': { $exists: true },
+      "completed.0": { $exists: true },
     })
       .sort({ date: 1 })
       .lean();
@@ -190,60 +277,73 @@ const getSolvedJournal = async (req, res, next) => {
 
     // Fetch problem details in one shot
     const problems = await Problem.find({ _id: { $in: [...allProblemIds] } })
-      .select('name difficulty topic leetcodeSlug gfgUrl slug youtubeUrl resourceUrl isPremium isOptional')
+      .select(
+        "name difficulty topic leetcodeSlug gfgUrl slug youtubeUrl resourceUrl isPremium isOptional",
+      )
       .lean();
     const problemMap = {};
-    problems.forEach((p) => { problemMap[p._id.toString()] = p; });
+    problems.forEach((p) => {
+      problemMap[p._id.toString()] = p;
+    });
 
     // Build journal entries grouped by day
-    const journal = progressDocs.map((doc) => {
-      const dateKey = new Date(doc.date).toISOString().split('T')[0];
-      const dayMeta = dayNumberMap[dateKey] || {};
+    const journal = progressDocs
+      .map((doc) => {
+        const dateKey = new Date(doc.date).toISOString().split("T")[0];
+        const dayMeta = dayNumberMap[dateKey] || {};
 
-      // Build notes lookup for this day
-      const notesLookup = {};
-      (doc.notes || []).forEach((n) => {
-        notesLookup[n.problemId.toString()] = { text: n.text, updatedAt: n.updatedAt };
-      });
-
-      const solvedProblems = doc.completed
-        .map((c) => {
-          const p = problemMap[c.problemId.toString()];
-          if (!p) return null;
-          
-          // Exclude optional or premium problems from journal
-          if (p.isOptional || p.isPremium) return null;
-
-          // Exclude problems without valid links
-          const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
-          const validGfg = (p.gfgUrl && p.gfgUrl !== 'null');
-          if (!validLc && !validGfg) return null;
-
-          return {
-            problemId: c.problemId,
-            name: p.name,
-            difficulty: p.difficulty,
-            topic: p.topic,
-            leetcodeSlug: p.leetcodeSlug || null,
-            gfgUrl: p.gfgUrl || null,
-            youtubeUrl: p.youtubeUrl || null,
-            resourceUrl: p.resourceUrl || null,
-            solvedAt: c.solvedAt,
-            note: notesLookup[c.problemId.toString()]?.text || '',
-            noteUpdatedAt: notesLookup[c.problemId.toString()]?.updatedAt || null,
+        // Build notes lookup for this day
+        const notesLookup = {};
+        (doc.notes || []).forEach((n) => {
+          notesLookup[n.problemId.toString()] = {
+            text: n.text,
+            updatedAt: n.updatedAt,
           };
-        })
-        .filter(Boolean);
+        });
 
-      return {
-        date: doc.date,
-        dateKey,
-        dayNumber: dayMeta.dayNumber || doc.dayNumber || null,
-        type: dayMeta.type || 'learn',
-        solvedCount: solvedProblems.length,
-        problems: solvedProblems,
-      };
-    }).filter((d) => d.problems.length > 0);
+        const solvedProblems = doc.completed
+          .map((c) => {
+            const p = problemMap[c.problemId.toString()];
+            if (!p) return null;
+
+            // Exclude optional or premium problems from journal
+            if (p.isOptional || p.isPremium) return null;
+
+            // Exclude problems without valid links
+            const validLc = p.leetcodeSlug && p.leetcodeSlug !== "null";
+            const validGfg = p.gfgUrl && p.gfgUrl !== "null";
+            if (!validLc && !validGfg) return null;
+
+            return {
+              problemId: c.problemId,
+              name: p.name,
+              difficulty: p.difficulty,
+              topic: p.topic,
+              leetcodeSlug: p.leetcodeSlug || null,
+              gfgUrl: p.gfgUrl || null,
+              youtubeUrl: p.youtubeUrl || null,
+              resourceUrl: p.resourceUrl || null,
+              solvedAt: c.solvedAt,
+              submissionUrl: c.submissionUrl || null,
+              submissionId: c.submissionId || null,
+              verifiedViaLC: !!c.verifiedViaLC,
+              note: notesLookup[c.problemId.toString()]?.text || "",
+              noteUpdatedAt:
+                notesLookup[c.problemId.toString()]?.updatedAt || null,
+            };
+          })
+          .filter(Boolean);
+
+        return {
+          date: doc.date,
+          dateKey,
+          dayNumber: dayMeta.dayNumber || doc.dayNumber || null,
+          type: dayMeta.type || "learn",
+          solvedCount: solvedProblems.length,
+          problems: solvedProblems,
+        };
+      })
+      .filter((d) => d.problems.length > 0);
 
     res.json({ success: true, data: journal });
   } catch (err) {
@@ -251,4 +351,12 @@ const getSolvedJournal = async (req, res, next) => {
   }
 };
 
-module.exports = { getAllProgress, getTodayProgress, markProblem, addNote, toggleBookmark, getSolvedJournal };
+module.exports = {
+  getAllProgress,
+  getTodayProgress,
+  markProblem,
+  addNote,
+  setSubmissionLink,
+  toggleBookmark,
+  getSolvedJournal,
+};

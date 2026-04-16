@@ -7,6 +7,15 @@ const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 const { updateStreak } = require('../services/streakService');
 
+const slugify = (value = '') => value
+  .toString()
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9\s-]/g, '')
+  .replace(/\s+/g, '-')
+  .replace(/-+/g, '-')
+  .replace(/^-|-$/g, '');
+
 /**
  * Shared helper: determine if a problem is a "core" trackable problem
  * (same logic used in scheduleController.getToday)
@@ -36,12 +45,17 @@ const computeDayCounts = async (dayEntry, progressDoc) => {
   });
   const mandatoryProblems = coreProblems;
 
-  const completedIds = new Set(
-    (progressDoc?.completed || []).map((c) => c.problemId.toString())
-  );
+  const completionMap = new Map();
+  (progressDoc?.completed || []).forEach((c) => {
+    completionMap.set(c.problemId.toString(), {
+      solved: true,
+      submissionUrl: c.submissionUrl || null,
+      verifiedViaLC: !!c.verifiedViaLC,
+    });
+  });
 
   // Count only mandatory problems that are completed
-  const mandatoryCompleted = mandatoryProblems.filter((p) => completedIds.has(p._id.toString()));
+  const mandatoryCompleted = mandatoryProblems.filter((p) => completionMap.has(p._id.toString()));
 
   return {
     coreAssigned: mandatoryProblems.length,
@@ -49,8 +63,10 @@ const computeDayCounts = async (dayEntry, progressDoc) => {
     allDone: mandatoryCompleted.length >= mandatoryProblems.length && mandatoryProblems.length > 0,
     problems: coreProblems.map((p) => ({
       ...p,
-      solved: completedIds.has(p._id.toString()),
+      solved: completionMap.has(p._id.toString()),
       isOptional: !!(p.isOptional || p.isPremium),
+      submissionUrl: completionMap.get(p._id.toString())?.submissionUrl || null,
+      verifiedViaLC: completionMap.get(p._id.toString())?.verifiedViaLC || false,
     })),
   };
 };
@@ -437,10 +453,11 @@ const getUserDetail = async (req, res, next) => {
            const dbCarryProbs = await Problem.find({ _id: { $in: carryoverProblemIds } }).lean();
            carryoverProblems = dbCarryProbs.filter(isValidProblem).map((p) => {
              const isOptional = p.isOptional || !!(p.leetcodeSlug && p.isPremium);
-             const SolvedIds = new Set((todayProgress?.completed || []).map(c => c.problemId.toString()));
+             const solvedMap = new Map((todayProgress?.completed || []).map(c => [c.problemId.toString(), c]));
              return {
                  ...p,
-                 solved: SolvedIds.has(p._id.toString()),
+                 solved: solvedMap.has(p._id.toString()),
+                 submissionUrl: solvedMap.get(p._id.toString())?.submissionUrl || null,
                  isOptional,
                  isCarryover: true
              };
@@ -861,6 +878,7 @@ const getUserActivityLog = async (req, res, next) => {
         topic: c.problemId?.topic || 'Unknown',
         solvedAt: c.solvedAt,
         verifiedViaLC: c.verifiedViaLC,
+        submissionUrl: c.submissionUrl || null,
       })),
       notesCount: p.notes?.length || 0,
       bookmarksCount: p.bookmarked?.length || 0,
@@ -989,8 +1007,9 @@ const getReports = async (req, res, next) => {
     
     const query = { status };
     const reports = await Report.find(query)
-      .populate('userId', 'username email')
+      .populate('userId', 'name email leetcodeUsername')
       .populate('problemId', 'name difficulty topic leetcodeSlug isOptional')
+      .populate('replacementApprovedBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
@@ -999,6 +1018,20 @@ const getReports = async (req, res, next) => {
     const total = await Report.countDocuments(query);
     
     res.json({ success: true, data: reports, pagination: { total, page: parseInt(page), pages: Math.ceil(total / limit) } });
+  } catch (e) { next(e); }
+};
+
+const approveReportReplacement = async (req, res, next) => {
+  try {
+    const report = await Report.findById(req.params.id);
+    if (!report) return next(createError('Report not found', 404));
+
+    report.adminApprovedReplacement = true;
+    report.replacementApprovedBy = req.user._id;
+    report.replacementApprovedAt = new Date();
+    await report.save();
+
+    res.json({ success: true, message: 'Replacement approved for user.' });
   } catch (e) { next(e); }
 };
 
@@ -1048,17 +1081,32 @@ const getUserFullSchedule = async (req, res, next) => {
     const progressMap = {};
     progressDocs.forEach((p) => {
       const key = new Date(p.date).toISOString().split('T')[0];
-      progressMap[key] = { allDone: p.allDone, completedCount: p.completed.length, completedIds: p.completed.map(c => c.problemId.toString()) };
+      const completedMeta = {};
+      (p.completed || []).forEach((c) => {
+        completedMeta[c.problemId.toString()] = {
+          submissionUrl: c.submissionUrl || null,
+          verifiedViaLC: !!c.verifiedViaLC,
+        };
+      });
+      progressMap[key] = {
+        allDone: p.allDone,
+        completedCount: p.completed.length,
+        completedIds: p.completed.map(c => c.problemId.toString()),
+        completedMeta,
+      };
     });
 
     const enrichedDays = schedule.days.map((d) => {
       const key = new Date(d.date).toISOString().split('T')[0];
       const prog = progressMap[key] || {};
       const completedSet = new Set(prog.completedIds || []);
+      const completedMeta = prog.completedMeta || {};
       
       const enrichedProblems = d.problems ? d.problems.map(sp => ({
         ...sp,
-        solved: completedSet.has(sp.problemId?._id?.toString())
+        solved: completedSet.has(sp.problemId?._id?.toString()),
+        submissionUrl: completedMeta[sp.problemId?._id?.toString()]?.submissionUrl || null,
+        verifiedViaLC: completedMeta[sp.problemId?._id?.toString()]?.verifiedViaLC || false,
       })) : [];
 
       return {
@@ -1071,6 +1119,63 @@ const getUserFullSchedule = async (req, res, next) => {
     });
 
     res.json({ success: true, data: enrichedDays });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const addCustomQuestionToDay = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const { dayNumber, name, topic, difficulty, resourceUrl } = req.body;
+
+    if (!dayNumber || !name) {
+      return next(createError('dayNumber and name are required.', 400));
+    }
+
+    const schedule = await Schedule.findOne({ userId });
+    if (!schedule) return next(createError('Schedule not found', 404));
+
+    const dayEntry = schedule.days.find((d) => d.dayNumber === parseInt(dayNumber));
+    if (!dayEntry) return next(createError('Day not found in schedule', 404));
+
+    const normalizedDifficulty = ['Easy', 'Medium', 'Hard'].includes(difficulty) ? difficulty : 'Medium';
+    const normalizedTopic = (topic || 'Custom').trim();
+
+    let baseSlug = slugify(name);
+    if (!baseSlug) baseSlug = `custom-q-${Date.now()}`;
+    let slug = `${baseSlug}-${Date.now()}`;
+
+    const customProblem = await Problem.create({
+      name: name.trim(),
+      slug,
+      difficulty: normalizedDifficulty,
+      topic: normalizedTopic,
+      resourceUrl: resourceUrl?.trim() || null,
+      source: 'custom',
+      isOptional: false,
+      isPremium: false,
+      leetcodeSlug: null,
+      gfgUrl: null,
+    });
+
+    if (!Array.isArray(dayEntry.problems)) dayEntry.problems = [];
+    dayEntry.problems.push({
+      problemId: customProblem._id,
+      difficulty: customProblem.difficulty,
+      topic: customProblem.topic,
+      isRevision: false,
+      status: 'pending',
+    });
+
+    schedule.markModified('days');
+    await schedule.save();
+
+    res.json({
+      success: true,
+      message: 'Custom question added to day successfully.',
+      data: { dayNumber: dayEntry.dayNumber, problem: customProblem },
+    });
   } catch (err) {
     next(err);
   }
@@ -1292,9 +1397,11 @@ module.exports = {
   toggleBanUser,
   adminMarkProblem,
   getReports,
+  approveReportReplacement,
   resolveReport,
   updateProblemAdmin,
   getUserFullSchedule,
+  addCustomQuestionToDay,
   adminReplaceProblem,
   adminRemoveProblem,
 };
