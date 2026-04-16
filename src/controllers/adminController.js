@@ -1078,43 +1078,52 @@ const getUserFullSchedule = async (req, res, next) => {
       .select('date allDone completed')
       .lean();
 
-    const progressMap = {};
+    const globalCompletedSet = new Set();
+    const globalCompletedMeta = {};
+
     progressDocs.forEach((p) => {
-      const key = new Date(p.date).toISOString().split('T')[0];
-      const completedMeta = {};
       (p.completed || []).forEach((c) => {
-        completedMeta[c.problemId.toString()] = {
+        globalCompletedSet.add(c.problemId.toString());
+        globalCompletedMeta[c.problemId.toString()] = {
           submissionUrl: c.submissionUrl || null,
           verifiedViaLC: !!c.verifiedViaLC,
         };
       });
-      progressMap[key] = {
-        allDone: p.allDone,
-        completedCount: p.completed.length,
-        completedIds: p.completed.map(c => c.problemId.toString()),
-        completedMeta,
-      };
     });
 
     const enrichedDays = schedule.days.map((d) => {
-      const key = new Date(d.date).toISOString().split('T')[0];
-      const prog = progressMap[key] || {};
-      const completedSet = new Set(prog.completedIds || []);
-      const completedMeta = prog.completedMeta || {};
-      
-      const enrichedProblems = d.problems ? d.problems.map(sp => ({
-        ...sp,
-        solved: completedSet.has(sp.problemId?._id?.toString()),
-        submissionUrl: completedMeta[sp.problemId?._id?.toString()]?.submissionUrl || null,
-        verifiedViaLC: completedMeta[sp.problemId?._id?.toString()]?.verifiedViaLC || false,
-      })) : [];
+      let coreProblemCount = 0;
+      let coreCompletedCount = 0;
+
+      const enrichedProblems = d.problems ? d.problems.map(sp => {
+        const probIdStr = sp.problemId?._id?.toString();
+        const solved = globalCompletedSet.has(probIdStr);
+        
+        // Exclude optional/premium from completion stats to match standard counts
+        const isOpt = sp.problemId?.isOptional || !!(sp.problemId?.leetcodeSlug && sp.problemId?.isPremium);
+        const validLc = sp.problemId?.leetcodeSlug && sp.problemId?.leetcodeSlug !== 'null';
+        const validGfg = (sp.problemId?.gfgUrl && sp.problemId?.gfgUrl !== 'null') || (sp.problemId?.gfgLink && sp.problemId?.gfgLink !== 'null');
+        const isValid = !!(validLc || validGfg);
+
+        if (!isOpt && isValid) {
+          coreProblemCount++;
+          if (solved) coreCompletedCount++;
+        }
+
+        return {
+          ...sp,
+          solved,
+          submissionUrl: globalCompletedMeta[probIdStr]?.submissionUrl || null,
+          verifiedViaLC: globalCompletedMeta[probIdStr]?.verifiedViaLC || false,
+        };
+      }) : [];
 
       return {
         ...d,
         problems: enrichedProblems,
-        allDone: prog.allDone || false,
-        completedCount: prog.completedCount || 0,
-        problemCount: d.problems ? d.problems.length : (d.problemIds?.length || 0),
+        allDone: coreProblemCount > 0 && coreCompletedCount >= coreProblemCount,
+        completedCount: coreCompletedCount,
+        problemCount: coreProblemCount,
       };
     });
 
@@ -1127,7 +1136,7 @@ const getUserFullSchedule = async (req, res, next) => {
 const addCustomQuestionToDay = async (req, res, next) => {
   try {
     const { id: userId } = req.params;
-    const { dayNumber, name, topic, difficulty, resourceUrl } = req.body;
+    const { dayNumber, name, topic, difficulty, resourceUrl, platform, leetcodeSlug, gfgUrl } = req.body;
 
     if (!dayNumber || !name) {
       return next(createError('dayNumber and name are required.', 400));
@@ -1142,6 +1151,20 @@ const addCustomQuestionToDay = async (req, res, next) => {
     const normalizedDifficulty = ['Easy', 'Medium', 'Hard'].includes(difficulty) ? difficulty : 'Medium';
     const normalizedTopic = (topic || 'Custom').trim();
 
+    // Resolve leetcode slug and GFG url based on platform selection
+    let resolvedLeetcodeSlug = null;
+    let resolvedGfgUrl = null;
+
+    if (platform === 'leetcode' && leetcodeSlug) {
+      // Strip full URL if pasted, extract just the slug
+      let slug = leetcodeSlug.trim();
+      const lcMatch = slug.match(/leetcode\.com\/problems\/([^/]+)/);
+      if (lcMatch) slug = lcMatch[1];
+      resolvedLeetcodeSlug = slug.replace(/^\/+|\/+$/g, '') || null;
+    } else if (platform === 'gfg' && gfgUrl) {
+      resolvedGfgUrl = gfgUrl.trim() || null;
+    }
+
     let baseSlug = slugify(name);
     if (!baseSlug) baseSlug = `custom-q-${Date.now()}`;
     let slug = `${baseSlug}-${Date.now()}`;
@@ -1155,8 +1178,8 @@ const addCustomQuestionToDay = async (req, res, next) => {
       source: 'custom',
       isOptional: false,
       isPremium: false,
-      leetcodeSlug: null,
-      gfgUrl: null,
+      leetcodeSlug: resolvedLeetcodeSlug,
+      gfgUrl: resolvedGfgUrl,
     });
 
     if (!Array.isArray(dayEntry.problems)) dayEntry.problems = [];
@@ -1171,6 +1194,19 @@ const addCustomQuestionToDay = async (req, res, next) => {
     schedule.markModified('days');
     await schedule.save();
 
+    // Sync Progress: if a Progress doc already exists for this day, add the problem to assigned
+    const dayDate = new Date(dayEntry.date);
+    const progress = await Progress.findOne({ userId, date: dayDate });
+    if (progress) {
+      const alreadyAssigned = progress.assigned.some(id => id.toString() === customProblem._id.toString());
+      if (!alreadyAssigned) {
+        progress.assigned.push(customProblem._id);
+        // Recalculate allDone since we added a new assignment
+        progress.allDone = progress.completed.length >= progress.assigned.length;
+        await progress.save();
+      }
+    }
+
     res.json({
       success: true,
       message: 'Custom question added to day successfully.',
@@ -1180,6 +1216,7 @@ const addCustomQuestionToDay = async (req, res, next) => {
     next(err);
   }
 };
+
 
 const adminReplaceProblem = async (req, res, next) => {
   try {
@@ -1311,6 +1348,10 @@ const adminReplaceProblem = async (req, res, next) => {
       }
     }
 
+    if (oldProblem.source === 'custom') {
+      await Problem.findByIdAndDelete(problemId);
+    }
+
     res.json({ success: true, message: 'Problem regenerated successfully.', data: replacement });
   } catch(err) { next(err); }
 };
@@ -1380,6 +1421,11 @@ const adminRemoveProblem = async (req, res, next) => {
         progress.allDone = progress.assigned.length === 0 ? false : progress.completed.length >= progress.assigned.length;
         await progress.save();
       }
+    }
+
+    const problem = await Problem.findById(problemId);
+    if (problem && problem.source === 'custom') {
+      await Problem.findByIdAndDelete(problemId);
     }
 
     res.json({ success: true, message: 'Problem removed successfully.' });

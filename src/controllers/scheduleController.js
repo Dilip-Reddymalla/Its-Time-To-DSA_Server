@@ -181,27 +181,43 @@ const getOverview = async (req, res, next) => {
     const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
     if (!schedule) return next(createError('Schedule not found', 404, 'NO_SCHEDULE'));
 
-    const progressDocs = await Progress.find({ userId: req.user._id })
-      .select('date allDone completed')
-      .lean();
+    const progressDocs = await Progress.find({ userId: req.user._id }).lean();
 
+    const globalCompletedSet = new Set();
     const progressMap = {};
+    
     progressDocs.forEach((p) => {
       const key = new Date(p.date).toISOString().split('T')[0];
-      progressMap[key] = { allDone: p.allDone, completedCount: p.completed.length };
+      progressMap[key] = p;
+      (p.completed || []).forEach(c => globalCompletedSet.add(c.problemId.toString()));
     });
 
     const overview = schedule.days.map((d) => {
       const key = new Date(d.date).toISOString().split('T')[0];
-      const prog = progressMap[key] || {};
+      const prog = progressMap[key];
+
+      let completedCount = 0;
+      let problemCount = 0;
+      let allDone = false;
+
+      if (prog && prog.assigned) {
+        problemCount = prog.assigned.length;
+        prog.assigned.forEach(id => {
+          if (globalCompletedSet.has(id.toString())) completedCount++;
+        });
+        allDone = problemCount > 0 && completedCount >= problemCount;
+      } else {
+        problemCount = d.problems ? d.problems.length : (d.problemIds?.length || 0);
+      }
+
       return {
         dayNumber: d.dayNumber,
         date: d.date,
         type: d.type,
-        problemCount: d.problems ? d.problems.length : (d.problemIds?.length || 0),
+        problemCount,
         estimatedTime: d.estimatedTime || 'Self-Paced',
-        allDone: prog.allDone || false,
-        completedCount: prog.completedCount || 0,
+        allDone,
+        completedCount,
         concepts: d.readings ? d.readings.map(r => r.title) : (d.concepts || []),
       };
     });
@@ -222,25 +238,52 @@ const getFullSchedule = async (req, res, next) => {
       return next(createError('Schedule not found', 404, 'NO_SCHEDULE'));
     }
 
-    // Merge progress data so the calendar can colour days without a second API call
-    const progressDocs = await Progress.find({ userId: req.user._id })
-      .select('date allDone completed')
-      .lean();
+    // Merge progress data and compute global completions
+    const progressDocs = await Progress.find({ userId: req.user._id }).lean();
 
+    const globalCompletedSet = new Set();
     const progressMap = {};
+
     progressDocs.forEach((p) => {
       const key = new Date(p.date).toISOString().split('T')[0];
-      progressMap[key] = { allDone: p.allDone, completedCount: p.completed.length };
+      progressMap[key] = p;
+      (p.completed || []).forEach(c => globalCompletedSet.add(c.problemId.toString()));
     });
 
     const enrichedDays = schedule.days.map((d) => {
       const key = new Date(d.date).toISOString().split('T')[0];
-      const prog = progressMap[key] || {};
+      const prog = progressMap[key];
+
+      let completedCount = 0;
+      let problemCount = 0;
+      let allDone = false;
+
+      if (prog && prog.assigned) {
+        problemCount = prog.assigned.length;
+        prog.assigned.forEach(id => {
+          if (globalCompletedSet.has(id.toString())) completedCount++;
+        });
+        allDone = problemCount > 0 && completedCount >= problemCount;
+      } else {
+        problemCount = d.problems ? d.problems.length : (d.problemIds?.length || 0);
+        // If not populated by progress.assigned, accurately count core problems manually since we populated
+        if (d.problems) {
+            let coreProblemCount = 0;
+            d.problems.forEach(sp => {
+              const isOpt = sp.problemId?.isOptional || !!(sp.problemId?.leetcodeSlug && sp.problemId?.isPremium);
+              const validLc = sp.problemId?.leetcodeSlug && sp.problemId?.leetcodeSlug !== 'null';
+              const validGfg = (sp.problemId?.gfgUrl && sp.problemId?.gfgUrl !== 'null') || (sp.problemId?.gfgLink && sp.problemId?.gfgLink !== 'null');
+              if (!isOpt && (validLc || validGfg)) coreProblemCount++;
+            });
+            problemCount = coreProblemCount;
+        }
+      }
+
       return {
         ...d,
-        allDone: prog.allDone || false,
-        completedCount: prog.completedCount || 0,
-        problemCount: d.problems ? d.problems.length : (d.problemIds?.length || 0),
+        allDone,
+        completedCount,
+        problemCount,
       };
     });
 
