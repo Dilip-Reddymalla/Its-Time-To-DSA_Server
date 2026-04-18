@@ -34,23 +34,8 @@ const getToday = async (req, res, next) => {
 
     if (!dayEntry) return next(createError('No schedule entry for today.', 404, 'NO_DAY_ENTRY'));
 
-    // Check if it's a rest day
-    if (dayEntry.type === 'rest') {
-       return res.json({
-          success: true,
-          data: {
-             isRestDay: true,
-             dayNumber: dayEntry.dayNumber,
-             date: dayEntry.date,
-             type: 'rest',
-             readings: dayEntry.readings || [],
-             problems: [],
-             searchPractice: [],
-             carryoverCount: 0,
-             progress: { total: 0, completed: 0, allDone: true }
-          }
-       });
-    }
+    // Check if it's a rest day (but don't early return so we can calculate carry-overs)
+    const isRestDay = dayEntry.type === 'rest';
 
     const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
     const problems = await Problem.find({ _id: { $in: problemIds } }).lean();
@@ -169,6 +154,7 @@ const getToday = async (req, res, next) => {
     res.json({
       success: true,
       data: {
+        isRestDay: isRestDay,
         dayNumber: dayEntry.dayNumber,
         date: dayEntry.date,
         type: dayEntry.type,
@@ -181,7 +167,7 @@ const getToday = async (req, res, next) => {
         progress: {
           total: requiredTotal,
           completed: requiredCompleted,
-          allDone: requiredCompleted >= requiredTotal && requiredTotal > 0,
+          allDone: (isRestDay && requiredTotal === 0) ? true : (requiredCompleted >= requiredTotal && requiredTotal > 0),
         },
       },
     });
