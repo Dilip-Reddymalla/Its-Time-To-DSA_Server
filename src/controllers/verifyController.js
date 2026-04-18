@@ -2,6 +2,7 @@ const Problem = require('../models/Problem');
 const Progress = require('../models/Progress');
 const Schedule = require('../models/Schedule');
 const User = require('../models/User');
+const PlatformConfig = require('../models/PlatformConfig');
 const { verifyLeetCodeSubmissions, buildSubmissionUrl } = require('../services/leetcodeService');
 const { updateStreak } = require('../services/streakService');
 const { createError } = require('../middleware/errorHandler');
@@ -12,6 +13,15 @@ const verifySubmissions = async (req, res, next) => {
   try {
     if (!req.user.leetcodeUsername) {
       return next(createError('No LeetCode username set. Complete onboarding first.', 400, 'NO_LC_USERNAME'));
+    }
+
+    if (req.user.isPaused) {
+       return next(createError('Your schedule is paused. Unpause to verify submissions.', 403, 'SCHEDULE_PAUSED'));
+    }
+
+    const getConfig = await PlatformConfig.findOne({ key: 'global' });
+    if (getConfig && getConfig.isPaused) {
+       return next(createError('The platform schedule is currently paused. Please check back later.', 403, 'SCHEDULE_PAUSED'));
     }
 
     const targetDate = getEffectiveTodayIST();

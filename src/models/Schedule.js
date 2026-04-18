@@ -4,7 +4,7 @@ const daySchema = new mongoose.Schema(
   {
     dayNumber: { type: Number, required: true },
     date: { type: Date, required: true },
-    type: { type: String, enum: ['learn', 'revision', 'mixed'], default: 'learn' },
+    type: { type: String, enum: ['learn', 'revision', 'mixed', 'rest'], default: 'learn' },
     isCompleted: { type: Boolean, default: false },
     readings: [
       {

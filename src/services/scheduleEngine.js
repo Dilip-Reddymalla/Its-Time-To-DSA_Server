@@ -1,5 +1,6 @@
 const Problem = require('../models/Problem');
 const Schedule = require('../models/Schedule');
+const User = require('../models/User');
 
 const PHASE_BLUEPRINTS = [
   { percent: 0.15, topics: ['Arrays', 'Strings', 'Basic Math'] },
@@ -86,6 +87,9 @@ const shuffleArray = (array) => {
 };
 
 const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, excludeProblemIds = []) => {
+  const user = await User.findById(userId);
+  const sundayRestEnabled = user ? user.sundayRestEnabled : true;
+  
   const excludeIds = (excludeProblemIds || []).map(id => id.toString());
   
   const start = new Date(startDate);
@@ -93,13 +97,27 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
   start.setUTCHours(0, 0, 0, 0);
 
   const phases = calculatePhases(totalDays);
-  const allAvailableProblems = await Problem.find({ _id: { $nin: excludeIds } }).lean();
+  const allAvailableProblemsRaw = await Problem.find({ _id: { $nin: excludeIds } }).lean();
   
+  // Sort so striver-a2z is processed first to win any deduplication conflicts
+  const allAvailableProblems = allAvailableProblemsRaw.sort((a, b) => {
+    if (a.source === 'striver-a2z' && b.source !== 'striver-a2z') return -1;
+    if (a.source !== 'striver-a2z' && b.source === 'striver-a2z') return 1;
+    return 0;
+  });
+
   const pool = {};
   const linklessPool = {};
+  const usedLeetcodeSlugs = new Set();
 
   allAvailableProblems.forEach(p => {
     const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+    
+    if (validLc) {
+      if (usedLeetcodeSlugs.has(p.leetcodeSlug)) return; // Deduplicate
+      usedLeetcodeSlugs.add(p.leetcodeSlug);
+    }
+
     const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
     const isValid = !!(validLc || validGfg);
 
@@ -166,10 +184,28 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
     return selected;
   };
 
-  for (let dayNum = 1; dayNum <= totalDays; dayNum++) {
+  let dayNum = 1;
+  let dateOffset = 0;
+
+  while (dayNum <= totalDays) {
     const date = new Date(start);
-    date.setUTCDate(start.getUTCDate() + dayNum - 1);
+    date.setUTCDate(start.getUTCDate() + dateOffset);
+    dateOffset++;
     
+    // === SUNDAY REST DAY ===
+    const isSunday = date.getUTCDay() === 0;
+    if (isSunday && sundayRestEnabled) {
+      days.push({
+        dayNumber: dayNum, // It stays on the same dayNumber, just rest
+        date,
+        type: 'rest',
+        isCompleted: false,
+        readings: [{ title: "🏖️ Rest Day — Try LeetCode's Problem of the Day!", type: 'suggestion' }],
+        problems: []
+      });
+      continue; // Skip the rest of the loop, do not increment dayNum
+    }
+
     // NEW: Check if the day is Saturday (0 is Sunday, 6 is Saturday)
     const isSaturday = date.getUTCDay() === 6;
 
@@ -307,6 +343,8 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
         status: 'pending'
       }))
     });
+
+    dayNum++; // Increment the learning day counter
   }
 
   await Schedule.findOneAndUpdate(

@@ -13,7 +13,7 @@ const completeOnboarding = async (req, res, next) => {
       return next(createError(errors.array()[0].msg, 400, 'VALIDATION_ERROR'));
     }
 
-    const { leetcodeUsername, startDate, dailyGoal, totalDays, forceReset } = req.body;
+    const { leetcodeUsername, startDate, dailyGoal, totalDays, sundayRestEnabled, forceReset } = req.body;
 
     // Check if schedule already exists
     const existingSchedule = await Schedule.findOne({ userId: req.user._id });
@@ -23,7 +23,7 @@ const completeOnboarding = async (req, res, next) => {
 
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { leetcodeUsername, startDate, dailyGoal, totalDays, onboardingComplete: true, lastActiveAt: new Date() },
+      { leetcodeUsername, startDate, dailyGoal, totalDays, sundayRestEnabled: sundayRestEnabled !== false, onboardingComplete: true, lastActiveAt: new Date() },
       { new: true }
     );
 
@@ -42,6 +42,7 @@ const completeOnboarding = async (req, res, next) => {
         startDate: user.startDate,
         dailyGoal: user.dailyGoal,
         totalDays: user.totalDays,
+        sundayRestEnabled: user.sundayRestEnabled,
         onboardingComplete: user.onboardingComplete,
       },
     });

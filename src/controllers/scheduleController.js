@@ -2,6 +2,7 @@ const Schedule = require('../models/Schedule');
 const Progress = require('../models/Progress');
 const Problem = require('../models/Problem');
 const Report = require('../models/Report');
+const PlatformConfig = require('../models/PlatformConfig');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 
@@ -16,7 +17,40 @@ const getToday = async (req, res, next) => {
       const dStr = toISTDateString(new Date(d.date));
       return dStr === todayStr;
     });
+    
+    // Check if user or platform is paused
+    const getConfig = await PlatformConfig.findOne({ key: 'global' });
+    const isGloballyPaused = getConfig && getConfig.isPaused;
+    if (req.user.isPaused || isGloballyPaused) {
+       return res.json({
+          success: true,
+          data: {
+             isPaused: true,
+             pauseReason: req.user.isPaused ? req.user.pauseReason : getConfig.pauseReason,
+             pausedAt: req.user.isPaused ? req.user.pausedAt : getConfig.pausedAt
+          }
+       });
+    }
+
     if (!dayEntry) return next(createError('No schedule entry for today.', 404, 'NO_DAY_ENTRY'));
+
+    // Check if it's a rest day
+    if (dayEntry.type === 'rest') {
+       return res.json({
+          success: true,
+          data: {
+             isRestDay: true,
+             dayNumber: dayEntry.dayNumber,
+             date: dayEntry.date,
+             type: 'rest',
+             readings: dayEntry.readings || [],
+             problems: [],
+             searchPractice: [],
+             carryoverCount: 0,
+             progress: { total: 0, completed: 0, allDone: true }
+          }
+       });
+    }
 
     const problemIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
     const problems = await Problem.find({ _id: { $in: problemIds } }).lean();

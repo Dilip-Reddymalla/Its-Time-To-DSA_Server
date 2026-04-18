@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema(
       default: 'medium',
     },
     totalDays: { type: Number, default: 90 },
+    sundayRestEnabled: { type: Boolean, default: true },
     usernameChangeCount: { type: Number, default: 0 },
     onboardingComplete: { type: Boolean, default: false },
 
@@ -30,6 +31,11 @@ const userSchema = new mongoose.Schema(
     restTokens: { type: Number, default: 1, max: 3 },
     totalSolved: { type: Number, default: 0 },
     lastStreakUpdate: { type: Date, default: null },
+
+    // Pause tracking
+    isPaused: { type: Boolean, default: false },
+    pauseReason: { type: String, default: null },
+    pausedAt: { type: Date, default: null },
 
     lastActiveAt: { type: Date, default: Date.now },
 

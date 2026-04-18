@@ -10,8 +10,8 @@ The Express.js + MongoDB backend powering the **Its-Time-To-DSA** platform. It h
 - **🗓️ Dynamic Schedule Engine** — Phase-based, difficulty-interleaved roadmap generator that scales to 60/90/120 days and respects user daily intensity goals (light/medium/intense)
 - **📈 LeetCode Sync** — Verifies solved problems against your LeetCode GraphQL API submissions
 - **📊 Stats API** — Heatmap data, topic breakdown, difficulty distribution, streak tracking
-- **🛡️ Admin Dashboard** — Platform-wide analytics, user progress audit, and problem health reporting
 - **🛠️ Problem Reporting System** — Automated triaging of broken links with a replacement engine for roadmap integrity
+- **⏸️ Schedule Control** — Admins can apply global platform schedule pauses. Users can opt-in/opt-out of Sunday Rest Days and request per-user schedule pauses, dynamically pushing dates linearly.
 - **🛡️ Security** — Helmet, CORS with credentials, express-rate-limit, input validation via express-validator
 - **🌱 Database Seeder** — Seeds the `problems` collection from real DSA CSV sheets (Arsh Goyal 45-60 Days, Shradha Ma'am 2.5 Months)
 
@@ -56,11 +56,12 @@ Its-Time-To-DSA_Server/
 │   │   └── verifyController.js     # LeetCode GraphQL submission sync
 │   ├── middleware/
 │   │   └── errorHandler.js         # Centralized error handler + createError
-│   ├── models/
 │   │   ├── Problem.js              # DSA problem schema
 │   │   ├── Progress.js             # Daily solve tracking per user
 │   │   ├── Schedule.js             # Generated roadmap (days[] with problems[])
-│   │   └── User.js                 # User profile + onboarding fields
+│   │   ├── User.js                 # User profile + onboarding fields
+│   │   ├── PlatformConfig.js       # Global config (e.g., Global Pause state)
+│   │   └── PauseRequest.js         # User pause requests
 │   ├── routes/
 │   │   ├── admin.js                 # /api/admin/* (Stats, user lists, triage)
 │   │   ├── auth.js                 # /api/auth/* (Google OAuth, me, logout)
@@ -257,8 +258,10 @@ Every Saturday generates a **Revision + Boss Fight** day:
   leetcodeUsername, startDate,
   dailyGoal: 'light' | 'medium' | 'intense',
   totalDays: Number,           // 60 / 90 / 120
+  sundayRestEnabled: Boolean,  // true / false
   usernameChangeCount,
   onboardingComplete,
+  isPaused: Boolean, pauseReason: String, pausedAt: Date,
   currentStreak, longestStreak, totalSolved
 }
 ```

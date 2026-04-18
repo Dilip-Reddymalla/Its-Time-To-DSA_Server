@@ -3,6 +3,8 @@ const Progress = require('../models/Progress');
 const Schedule = require('../models/Schedule');
 const Problem = require('../models/Problem');
 const Report = require('../models/Report');
+const PlatformConfig = require('../models/PlatformConfig');
+const PauseRequest = require('../models/PauseRequest');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 const { updateStreak } = require('../services/streakService');
@@ -1432,6 +1434,152 @@ const adminRemoveProblem = async (req, res, next) => {
   } catch(err) { next(err); }
 };
 
+// ─── 11. Platform Pause & User Pause  ───────────────────────────────────────
+const toggleGlobalPause = async (req, res, next) => {
+  try {
+    const { isPaused, reason } = req.body;
+    let config = await PlatformConfig.findOne({ key: 'global' });
+    if (!config) {
+      config = new PlatformConfig({ key: 'global' });
+    }
+
+    if (isPaused && !config.isPaused) {
+      // Pausing
+      config.isPaused = true;
+      config.pausedAt = new Date();
+      config.pausedBy = req.user._id;
+      config.pauseReason = reason || 'Admin paused the schedule';
+    } else if (!isPaused && config.isPaused) {
+      // Resuming - calculate duration and shift dates for EVERYONE
+      const now = new Date();
+      const durationMs = now.getTime() - config.pausedAt.getTime();
+      const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24)); // Round up to shift properly
+      
+      const allSchedules = await Schedule.find({});
+      for (const sched of allSchedules) {
+        if (!sched.days) continue;
+        let modified = false;
+        sched.days.forEach(day => {
+           if (new Date(day.date) >= config.pausedAt) {
+             const d = new Date(day.date);
+             d.setUTCDate(d.getUTCDate() + durationDays);
+             day.date = d;
+             modified = true;
+           }
+        });
+        if (modified) {
+          sched.markModified('days');
+          await sched.save();
+        }
+      }
+
+      config.pauseHistory.push({
+        pausedAt: config.pausedAt,
+        resumedAt: now,
+        pausedBy: config.pausedBy,
+        reason: config.pauseReason,
+        durationDays
+      });
+
+      config.totalPausedDays += durationDays;
+      config.isPaused = false;
+      config.pausedAt = null;
+      config.pausedBy = null;
+      config.pauseReason = null;
+    }
+
+    await config.save();
+    res.json({ success: true, data: config });
+  } catch (err) { next(err); }
+};
+
+const getGlobalPauseStatus = async (req, res, next) => {
+  try {
+    let config = await PlatformConfig.findOne({ key: 'global' }).populate('pausedBy', 'name');
+    if (!config) config = { isPaused: false, pauseHistory: [] };
+    res.json({ success: true, data: config });
+  } catch (err) { next(err); }
+};
+
+const toggleUserPause = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isPaused, reason } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) return next(createError('User not found', 404));
+
+    if (isPaused && !user.isPaused) {
+      user.isPaused = true;
+      user.pausedAt = new Date();
+      user.pauseReason = reason || 'Admin paused the schedule';
+      await user.save();
+    } else if (!isPaused && user.isPaused) {
+      const now = new Date();
+      const durationMs = now.getTime() - user.pausedAt.getTime();
+      const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+
+      const sched = await Schedule.findOne({ userId: id });
+      if (sched && sched.days) {
+         let modified = false;
+         sched.days.forEach(day => {
+           if (new Date(day.date) >= user.pausedAt) {
+             const d = new Date(day.date);
+             d.setUTCDate(d.getUTCDate() + durationDays);
+             day.date = d;
+             modified = true;
+           }
+         });
+         if (modified) {
+            sched.markModified('days');
+            await sched.save();
+         }
+      }
+
+      user.isPaused = false;
+      user.pausedAt = null;
+      user.pauseReason = null;
+      await user.save();
+    }
+
+    res.json({ success: true, message: `User pause status updated to ${isPaused}` });
+  } catch (err) { next(err); }
+};
+
+const getPauseRequests = async (req, res, next) => {
+  try {
+    const requests = await PauseRequest.find({ status: 'pending' }).populate('userId', 'name email avatar').sort({ requestedAt: 1 }).lean();
+    res.json({ success: true, data: requests });
+  } catch (err) { next(err); }
+};
+
+const handlePauseRequest = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // 'approved' or 'rejected'
+
+    const request = await PauseRequest.findById(id);
+    if (!request) return next(createError('Request not found', 404));
+
+    request.status = status;
+    request.resolvedAt = new Date();
+    request.resolvedBy = req.user._id;
+    await request.save();
+
+    if (status === 'approved') {
+      const user = await User.findById(request.userId);
+      if (user && !user.isPaused) {
+        user.isPaused = true;
+        user.pausedAt = request.requestedAt; // Retroactive pause
+        user.pauseReason = request.reason;
+        await user.save();
+      }
+    }
+
+    res.json({ success: true, message: `Pause request ${status}` });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   getDashboardOverview,
   getAllUsers,
@@ -1450,4 +1598,9 @@ module.exports = {
   addCustomQuestionToDay,
   adminReplaceProblem,
   adminRemoveProblem,
+  toggleGlobalPause,
+  getGlobalPauseStatus,
+  toggleUserPause,
+  getPauseRequests,
+  handlePauseRequest
 };

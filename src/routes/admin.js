@@ -18,6 +18,11 @@ const {
   addCustomQuestionToDay,
   adminReplaceProblem,
   adminRemoveProblem,
+  toggleGlobalPause,
+  getGlobalPauseStatus,
+  toggleUserPause,
+  getPauseRequests,
+  handlePauseRequest
 } = require('../controllers/adminController');
 
 // ─── Read-Only Endpoints ─────────────────────────────────────────────────────
@@ -30,6 +35,8 @@ router.get('/users/:id/activity', getUserActivityLog);
 router.get('/today', getTodaySnapshot);
 router.get('/stats', getPlatformStats);
 router.get('/leaderboard', getLeaderboard);
+router.get('/pause-status', getGlobalPauseStatus);
+router.get('/pause-requests', getPauseRequests);
 
 // ─── Write Endpoints ─────────────────────────────────────────────────────────
 router.post('/users/:id/ban', toggleBanUser);
@@ -40,5 +47,9 @@ router.post('/users/:id/custom-question', addCustomQuestionToDay);
 router.put('/reports/:id/approve-replacement', approveReportReplacement);
 router.put('/reports/:id/resolve', resolveReport);
 router.put('/problems/:id', updateProblemAdmin);
+
+router.post('/pause-status', toggleGlobalPause);
+router.post('/users/:id/pause', toggleUserPause);
+router.put('/pause-requests/:id', handlePauseRequest);
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Progress = require('../models/Progress');
+const PlatformConfig = require('../models/PlatformConfig');
+const Schedule = require('../models/Schedule');
 
 const { 
   getEffectiveTodayIST, 
@@ -19,7 +21,12 @@ const {
  */
 const updateStreak = async (userId) => {
   const user = await User.findById(userId);
-  if (!user) return { currentStreak: 0, longestStreak: 0 };
+  if (!user || user.isPaused) return { currentStreak: user ? user.currentStreak : 0, longestStreak: user ? user.longestStreak : 0 };
+
+  const platformConfig = await PlatformConfig.findOne({ key: 'global' });
+  if (platformConfig && platformConfig.isPaused) {
+    return { currentStreak: user.currentStreak, longestStreak: user.longestStreak };
+  }
 
   const today = getEffectiveTodayIST();
   const yesterday = getEffectiveYesterdayIST();
@@ -44,7 +51,19 @@ const updateStreak = async (userId) => {
   
   // Check if yesterday was solved or if it was a rest day
   const yesterdayProgress = await Progress.findOne({ userId, date: yesterday });
-  const solvedYesterday = (yesterdayProgress?.completed?.length || 0) > 0 || yesterdayProgress?.isRestDay === true;
+  
+  // Also check if yesterday was a scheduled 'rest' day
+  const sched = await Schedule.findOne({ userId }).lean();
+  let wasScheduledRestDay = false;
+  if (sched && sched.days) {
+    const yesterdayStr = toISTDateString(yesterday);
+    const dayEntry = sched.days.find(d => toISTDateString(new Date(d.date)) === yesterdayStr);
+    if (dayEntry && dayEntry.type === 'rest') {
+      wasScheduledRestDay = true;
+    }
+  }
+
+  const solvedYesterday = (yesterdayProgress?.completed?.length || 0) > 0 || yesterdayProgress?.isRestDay === true || wasScheduledRestDay;
 
   if (solvedYesterday || currentStreak === 0) {
     currentStreak += 1;
@@ -71,17 +90,33 @@ const updateStreak = async (userId) => {
  */
 const checkAndBreakStreak = async (userId) => {
   const user = await User.findById(userId);
-  if (!user || user.currentStreak === 0) return;
+  if (!user || user.currentStreak === 0 || user.isPaused) return;
+  
+  const platformConfig = await PlatformConfig.findOne({ key: 'global' });
+  if (platformConfig && platformConfig.isPaused) return;
 
   const yesterday = getEffectiveYesterdayIST();
+  
+  // Check if yesterday was a scheduled 'rest' day
+  const sched = await Schedule.findOne({ userId }).lean();
+  let wasScheduledRestDay = false;
+  if (sched && sched.days) {
+    const yesterdayStr = toISTDateString(yesterday);
+    const dayEntry = sched.days.find(d => toISTDateString(new Date(d.date)) === yesterdayStr);
+    if (dayEntry && dayEntry.type === 'rest') {
+      wasScheduledRestDay = true;
+    }
+  }
+
   const yesterdayProgress = await Progress.findOne({ userId, date: yesterday });
   const solvedYesterday = yesterdayProgress?.completed?.length || 0;
 
   // If yesterday had 0 solved and today is past midnight IST → break streak
+  // UNLESS it was a scheduled rest day
   const nowIST = new Date(Date.now() + IST_OFFSET_MS);
   const isAfterMidnight = nowIST.getUTCHours() >= 2; // grace period: 2h
 
-  if (solvedYesterday === 0 && isAfterMidnight) {
+  if (solvedYesterday === 0 && isAfterMidnight && !wasScheduledRestDay) {
     if (user.restTokens > 0) {
       // Consume a rest token to protect the streak
       await User.findByIdAndUpdate(userId, { $inc: { restTokens: -1 } });
