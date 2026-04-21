@@ -275,6 +275,7 @@ const generateSchedule = async (userId, startDate, dailyGoal, totalDays = 90, ex
           status: 'pending'
         }))
       });
+      dayNum++;
       continue;
     }
 

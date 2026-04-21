@@ -126,7 +126,6 @@ const checkAndBreakStreak = async (userId) => {
         await yesterdayProgress.save();
       } else {
         // Create an empty progress with isRestDay to show on heatmap
-        const Schedule = require('../models/Schedule');
         const sched = await Schedule.findOne({ userId });
         const dayEntry = sched?.days.find(d => {
           const d2 = new Date(d.date);
@@ -152,4 +151,4 @@ const checkAndBreakStreak = async (userId) => {
   return user.currentStreak;
 };
 
-module.exports = { updateStreak, checkAndBreakStreak, getEffectiveTodayIST };
+module.exports = { updateStreak, checkAndBreakStreak };

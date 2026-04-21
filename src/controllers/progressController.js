@@ -36,11 +36,12 @@ const getTodayProgress = async (req, res, next) => {
       });
 
       if (dayEntry) {
+        const rawAssignedIds = dayEntry.problems ? dayEntry.problems.map(p => p.problemId) : (dayEntry.problemIds || []);
         const newProgress = await Progress.create({
           userId: req.user._id,
           date: today,
           dayNumber: dayEntry.dayNumber,
-          assigned: dayEntry.problemIds,
+          assigned: rawAssignedIds,
         });
         progress = newProgress;
       }

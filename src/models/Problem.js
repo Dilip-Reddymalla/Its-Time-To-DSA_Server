@@ -13,6 +13,7 @@ const problemSchema = new mongoose.Schema(
     subtopic: { type: String, trim: true, default: null },
     leetcodeSlug: { type: String, trim: true, default: null },
     gfgUrl: { type: String, trim: true, default: null },
+    gfgLink: { type: String, trim: true, default: null },
     resourceUrl: { type: String, default: null },
     youtubeUrl: { type: String, trim: true, default: null },
     striverTopic: { type: String, default: null },

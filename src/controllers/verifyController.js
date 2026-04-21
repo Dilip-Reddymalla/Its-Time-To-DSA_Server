@@ -11,6 +11,10 @@ const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
 
 const verifySubmissions = async (req, res, next) => {
   try {
+    if (req.user.isBanned) {
+      return next(createError('Your account has been banned.', 403, 'USER_BANNED'));
+    }
+
     if (!req.user.leetcodeUsername) {
       return next(createError('No LeetCode username set. Complete onboarding first.', 400, 'NO_LC_USERNAME'));
     }
@@ -137,8 +141,24 @@ const verifySubmissions = async (req, res, next) => {
       updated.push({ slug: problem.leetcodeSlug, solved, submissionUrl: solved ? submissionUrl : null });
     }
 
-    const totalAssigned = dayEntry.problems ? dayEntry.problems.length : (dayEntry.problemIds?.length || progress.assigned?.length || 0);
-    progress.allDone = progress.completed.length >= totalAssigned;
+    const mandatoryAssignedCount = problems.filter(p => {
+       const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+       const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
+       const isOptional = p.isOptional || !!(p.leetcodeSlug && p.isPremium);
+       return (validLc || validGfg) && !isOptional;
+    }).length;
+
+    const mandatoryCompletedCount = progress.completed.filter(c => {
+       const p = problems.find(prob => prob._id.toString() === c.problemId.toString());
+       if (!p) return false;
+       const validLc = p.leetcodeSlug && p.leetcodeSlug !== 'null';
+       const validGfg = (p.gfgUrl && p.gfgUrl !== 'null') || (p.gfgLink && p.gfgLink !== 'null');
+       const isOptional = p.isOptional || !!(p.leetcodeSlug && p.isPremium);
+       return (validLc || validGfg) && !isOptional;
+    }).length;
+
+    const isRestDay = dayEntry.type === 'rest';
+    progress.allDone = (isRestDay && mandatoryAssignedCount === 0) ? true : (mandatoryCompletedCount >= mandatoryAssignedCount && mandatoryAssignedCount > 0);
     progress.verifiedAt = new Date();
     await progress.save();
 

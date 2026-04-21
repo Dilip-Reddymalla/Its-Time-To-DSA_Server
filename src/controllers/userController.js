@@ -5,6 +5,7 @@ const PauseRequest = require('../models/PauseRequest');
 const { generateSchedule } = require('../services/scheduleEngine');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST } = require('../utils/dateUtils');
+const { reconcileRevisionDays } = require('../utils/scheduleUtils');
 
 const getProfile = async (req, res, next) => {
   try {
@@ -120,6 +121,7 @@ const updateProfile = async (req, res, next) => {
         }
 
         if (hasMutated) {
+          reconcileRevisionDays(newDays);
           schedule.days = newDays;
           schedule.markModified('days');
           await schedule.save();

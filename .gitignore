@@ -29,3 +29,6 @@ tmp/
 test-output.txt
 test-schedule.js
 debug_db.js
+scratch/
+scripts/*.csv
+scripts/striver_full.json

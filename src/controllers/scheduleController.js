@@ -1,6 +1,7 @@
 const Schedule = require('../models/Schedule');
 const Progress = require('../models/Progress');
 const Problem = require('../models/Problem');
+const User = require('../models/User');
 const Report = require('../models/Report');
 const PlatformConfig = require('../models/PlatformConfig');
 const { createError } = require('../middleware/errorHandler');
@@ -155,6 +156,7 @@ const getToday = async (req, res, next) => {
       success: true,
       data: {
         isRestDay: isRestDay,
+        isRevision: dayEntry.type === 'revision' || dayEntry.type === 'mixed',
         dayNumber: dayEntry.dayNumber,
         date: dayEntry.date,
         type: dayEntry.type,

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { reconcileRevisionDays } = require('../utils/scheduleUtils');
 const Progress = require('../models/Progress');
 const Schedule = require('../models/Schedule');
 const Problem = require('../models/Problem');
@@ -442,10 +443,8 @@ const getUserDetail = async (req, res, next) => {
 
           for (const pid of pastAssignedIds) {
             if (!globalCompletedBeforeToday.has(pid) && !alreadyIncludedIds.has(pid)) {
-              if (isValidProblem({ leetcodeSlug: 'mock', gfgUrl: 'mock' })) { // We use actual Problem filtering later
                  carryoverProblemIds.push(pid);
                  alreadyIncludedIds.add(pid);
-              }
             }
           }
         }
@@ -1468,6 +1467,7 @@ const toggleGlobalPause = async (req, res, next) => {
            }
         });
         if (modified) {
+          reconcileRevisionDays(sched.days);
           sched.markModified('days');
           await sched.save();
         }
@@ -1531,6 +1531,7 @@ const toggleUserPause = async (req, res, next) => {
            }
          });
          if (modified) {
+            reconcileRevisionDays(sched.days);
             sched.markModified('days');
             await sched.save();
          }
