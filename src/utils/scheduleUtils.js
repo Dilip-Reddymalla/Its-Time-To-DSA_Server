@@ -1,38 +1,93 @@
 /**
  * reconcileRevisionDays(days)
  *
- * After any date-shifting operation (Sunday rest insertion, pause/resume, etc.),
- * walk through the schedule days and ensure:
- *   - Days landing on Saturday (getUTCDay() === 6) have type 'revision'
- *   - Days NOT on Saturday that are incorrectly marked 'revision' get corrected to 'learn'
- *   - Rest days (Sundays) are never touched
+ * PURELY DATE-DRIVEN reconciliation that fixes BOTH labels AND content.
  *
- * This is NON-DESTRUCTIVE — it only changes metadata labels (type, isRevision),
- * never the actual problem assignments.
+ * After any date-shifting operation (Sunday rest insertion, pause/resume, etc.),
+ * this function:
+ *   1. Corrects type labels based on the actual date (Saturday = revision, else = learn)
+ *   2. SWAPS problem content between misaligned days:
+ *      - Finds current Saturdays that are missing their boss-fight content
+ *      - Finds non-Saturday days that have boss-fight content (displaced by shift)
+ *      - Swaps their problem arrays so Hard/revision content lands on actual Saturdays
+ *
+ * Rules:
+ *   - Rest days (type === 'rest') are NEVER touched.
+ *   - Saturday (getUTCDay() === 6) → type = 'revision'
+ *   - Any other weekday → type = 'learn'
  */
 function reconcileRevisionDays(days) {
+  // ── PASS 1: Fix type labels (purely date-driven) ──
   for (const day of days) {
-    // Never touch rest days
     if (day.type === 'rest') continue;
-
     const dayOfWeek = new Date(day.date).getUTCDay();
 
-    if (dayOfWeek === 6 && day.type !== 'revision') {
-      // This day now falls on Saturday but isn't labelled as revision
+    if (dayOfWeek === 6) {
       day.type = 'revision';
-      if (day.problems) {
-        day.problems.forEach(p => { p.isRevision = true; });
-      }
-      if (day.readings) {
-        day.readings = [{ title: "Weekly Wrap-up & Spaced Repetition", type: 'concept' }];
-      }
-    } else if (dayOfWeek !== 6 && day.type === 'revision') {
-      // This day is labelled revision but no longer falls on Saturday
+    } else {
       day.type = 'learn';
-      if (day.problems) {
-        day.problems.forEach(p => { p.isRevision = false; });
+    }
+  }
+
+  // ── PASS 2: Identify content misalignment and swap ──
+  // A "real Saturday" should have at least one Hard problem (boss fight).
+  // After a Sunday shift, the boss-fight content is on the wrong day.
+
+  // Collect current Saturdays that are MISSING hard content
+  const emptySaturdays = [];
+  // Collect non-Saturday days that HAVE hard content (displaced boss fights)
+  const displacedBossDays = [];
+
+  for (const day of days) {
+    if (day.type === 'rest') continue;
+    const dayOfWeek = new Date(day.date).getUTCDay();
+    const hasHard = day.problems?.some(p => p.difficulty === 'Hard');
+
+    if (dayOfWeek === 6 && !hasHard && day.problems?.length > 0) {
+      emptySaturdays.push(day);
+    } else if (dayOfWeek !== 6 && hasHard && day.type === 'learn') {
+      displacedBossDays.push(day);
+    }
+  }
+
+  // Match each empty Saturday with the nearest displaced boss-fight day and swap
+  for (const sat of emptySaturdays) {
+    const satDate = new Date(sat.date).getTime();
+
+    // Find the closest displaced day (prefer days just before the Saturday)
+    let bestIdx = -1;
+    let bestDist = Infinity;
+    for (let i = 0; i < displacedBossDays.length; i++) {
+      const dDate = new Date(displacedBossDays[i].date).getTime();
+      const dist = Math.abs(dDate - satDate);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
       }
     }
+
+    if (bestIdx === -1) continue; // No displaced days left to swap
+
+    const displaced = displacedBossDays[bestIdx];
+
+    // SWAP problem arrays
+    const satProblems = sat.problems;
+    const satReadings = sat.readings;
+    sat.problems = displaced.problems;
+    sat.readings = [{ title: "Weekly Wrap-up & Spaced Repetition", type: 'concept' }];
+    displaced.problems = satProblems;
+    displaced.readings = satReadings;
+
+    // Fix isRevision flags after swap
+    if (sat.problems) {
+      sat.problems.forEach(p => { p.isRevision = true; });
+    }
+    if (displaced.problems) {
+      displaced.problems.forEach(p => { p.isRevision = false; });
+    }
+
+    // Remove the used displaced day from the pool
+    displacedBossDays.splice(bestIdx, 1);
   }
 
   return days;

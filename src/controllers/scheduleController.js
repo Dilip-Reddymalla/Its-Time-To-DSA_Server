@@ -6,15 +6,31 @@ const Report = require('../models/Report');
 const PlatformConfig = require('../models/PlatformConfig');
 const { createError } = require('../middleware/errorHandler');
 const { getEffectiveTodayIST, toISTDateString } = require('../utils/dateUtils');
+const { reconcileRevisionDays } = require('../utils/scheduleUtils');
 
 
 const getToday = async (req, res, next) => {
   try {
-    const schedule = await Schedule.findOne({ userId: req.user._id }).lean();
+    // Use a non-lean query so we can save if heal-on-read corrects anything
+    const schedule = await Schedule.findOne({ userId: req.user._id });
     if (!schedule) return next(createError('Schedule not generated yet.', 404, 'NO_SCHEDULE'));
 
+    // ── Heal-on-read: fix any corrupted Saturday/revision labels from prior shift bugs ──
+    const snapshot = (days) => JSON.stringify(days.map(d => ({ type: d.type, p: d.problems?.map(p => p.problemId?.toString() + (p.isRevision ? 'R' : '')) })));
+    const beforeJSON = snapshot(schedule.days);
+    reconcileRevisionDays(schedule.days);
+    const afterJSON = snapshot(schedule.days);
+    if (beforeJSON !== afterJSON) {
+      schedule.markModified('days');
+      await schedule.save();
+      console.log(`🩹 Healed revision-day labels for user ${req.user._id}`);
+    }
+
+    // Convert to plain object for the rest of the logic
+    const scheduleData = schedule.toObject();
+
     const todayStr = toISTDateString(getEffectiveTodayIST());
-    const dayEntry = schedule.days.find((d) => {
+    const dayEntry = scheduleData.days.find((d) => {
       const dStr = toISTDateString(new Date(d.date));
       return dStr === todayStr;
     });
@@ -88,7 +104,7 @@ const getToday = async (req, res, next) => {
       }
     });
 
-    for (const pastDay of schedule.days) {
+    for (const pastDay of scheduleData.days) {
       const pastDayStr = toISTDateString(new Date(pastDay.date));
 
       // Skip today and future days
@@ -252,13 +268,26 @@ const getOverview = async (req, res, next) => {
 
 const getFullSchedule = async (req, res, next) => {
   try {
+    // ── Heal-on-read: fix corrupted revision labels before populating ──
+    const rawSchedule = await Schedule.findOne({ userId: req.user._id });
+    if (!rawSchedule) {
+      return next(createError('Schedule not found', 404, 'NO_SCHEDULE'));
+    }
+
+    const snapshot = (days) => JSON.stringify(days.map(d => ({ type: d.type, p: d.problems?.map(p => p.problemId?.toString() + (p.isRevision ? 'R' : '')) })));
+    const beforeJSON = snapshot(rawSchedule.days);
+    reconcileRevisionDays(rawSchedule.days);
+    const afterJSON = snapshot(rawSchedule.days);
+    if (beforeJSON !== afterJSON) {
+      rawSchedule.markModified('days');
+      await rawSchedule.save();
+      console.log(`🩹 Healed revision-day labels (full) for user ${req.user._id}`);
+    }
+
+    // Now re-fetch with population for the response
     const schedule = await Schedule.findOne({ userId: req.user._id })
       .populate('days.problems.problemId', 'name difficulty topic leetcodeSlug slug gfgUrl youtubeUrl resourceUrl source')
       .lean();
-
-    if (!schedule) {
-      return next(createError('Schedule not found', 404, 'NO_SCHEDULE'));
-    }
 
     // Merge progress data and compute global completions
     const progressDocs = await Progress.find({ userId: req.user._id }).lean();
